@@ -25,7 +25,7 @@
     "prebuild": "rimraf dist",
     "build": "nest build",
     "build:docker": "docker build -t libterty8186/favoriate-movies .",
-    "build:test": "docker build -t favoriate-movies-build-test .",
+    "build:test": "docker build -t favoriate-movies-server-build-test .",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
