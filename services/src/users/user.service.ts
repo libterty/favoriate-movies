@@ -7,6 +7,6 @@ export class UserService {
   private readonly httpResponse = new HTTPResponse();
 
   public async getRequest(): Promise<IShare.IResponseBase<string>> {
-    return this.httpResponse.StatusOK("Hello World!");
+    return this.httpResponse.StatusOK('Hello World!');
   }
 }
