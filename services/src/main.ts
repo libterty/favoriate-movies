@@ -14,6 +14,7 @@ async function bootstrap() {
       transform: true,
     }),
   );
+  app.setGlobalPrefix(`${config.PREFIX}${config.API_EXPLORER_PATH}`);
   app.enableCors({
     credentials: true,
     origin: true,
