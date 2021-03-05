@@ -8,7 +8,7 @@ export const ormConfig: TypeOrmModuleOptions = {
   username: config.DB_SETTINGS.username,
   password: config.DB_SETTINGS.password,
   database: config.DB_SETTINGS.database,
-  entities: [__dirname + '/../**/*.entity.{js,ts}'],
-  migrations: [__dirname + './migration/*.ts'],
+  entities: [`${__dirname}/../**/*.entity.{js,ts}`],
+  migrations: [`${__dirname}./migration/*.ts`],
   synchronize: true,
 };
