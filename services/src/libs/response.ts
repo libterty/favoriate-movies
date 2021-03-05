@@ -1,5 +1,5 @@
-import { HttpStatus } from "@nestjs/common";
-import * as IShare from "../shares/interfaces"
+import { HttpStatus } from '@nestjs/common';
+import * as IShare from '../shares/interfaces';
 
 export default class HTTPResponse {
   /**
@@ -10,7 +10,7 @@ export default class HTTPResponse {
    */
   StatusOK<T>(message: T): IShare.IResponseBase<T> {
     return Object.freeze({
-      status: "success",
+      status: 'success',
       statusCode: HttpStatus.OK,
       message,
     });
@@ -24,7 +24,7 @@ export default class HTTPResponse {
    */
   StatusCreated<T>(message: T): IShare.IResponseBase<T> {
     return Object.freeze({
-      status: "success",
+      status: 'success',
       statusCode: HttpStatus.CREATED,
       message,
     });
@@ -37,7 +37,7 @@ export default class HTTPResponse {
    */
   StatusNoContent(): IShare.IResponseBase<unknown> {
     return Object.freeze({
-      status: "success",
+      status: 'success',
       statusCode: HttpStatus.NO_CONTENT,
     });
   }
@@ -50,7 +50,7 @@ export default class HTTPResponse {
    */
   ParitalContent<T>(message: T): IShare.IResponseBase<T> {
     return Object.freeze({
-      status: "success",
+      status: 'success',
       statusCode: HttpStatus.PARTIAL_CONTENT,
       message,
     });
@@ -64,7 +64,7 @@ export default class HTTPResponse {
    */
   BadRequestError<T>(message: T): IShare.IResponseBase<T> {
     return Object.freeze({
-      status: "error",
+      status: 'error',
       statusCode: HttpStatus.BAD_REQUEST,
       message,
     });
@@ -78,7 +78,7 @@ export default class HTTPResponse {
    */
   UnAuthorizedError<T>(message: T): IShare.IResponseBase<T> {
     return Object.freeze({
-      status: "error",
+      status: 'error',
       statusCode: HttpStatus.UNAUTHORIZED,
       message,
     });
@@ -92,7 +92,7 @@ export default class HTTPResponse {
    */
   ForbiddenError<T>(message: T): IShare.IResponseBase<T> {
     return Object.freeze({
-      status: "error",
+      status: 'error',
       statusCode: HttpStatus.FORBIDDEN,
       message,
     });
@@ -106,7 +106,7 @@ export default class HTTPResponse {
    */
   NotFoundError<T>(message: T): IShare.IResponseBase<T> {
     return Object.freeze({
-      status: "error",
+      status: 'error',
       statusCode: HttpStatus.NOT_FOUND,
       message,
     });
@@ -120,7 +120,7 @@ export default class HTTPResponse {
    */
   ConflictError<T>(message: T): IShare.IResponseBase<T> {
     return Object.freeze({
-      status: "error",
+      status: 'error',
       statusCode: HttpStatus.CONFLICT,
       message,
     });
@@ -134,7 +134,7 @@ export default class HTTPResponse {
    */
   InternalServerError<T>(message: T): IShare.IResponseBase<T> {
     return Object.freeze({
-      status: "error",
+      status: 'error',
       statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
       message,
     });
