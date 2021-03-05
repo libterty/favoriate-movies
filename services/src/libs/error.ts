@@ -1,6 +1,8 @@
 class ErrorBase extends Error {
   public name: string;
+
   public stack: string;
+
   constructor(message: string) {
     super(message);
     this.name = this.constructor.name;

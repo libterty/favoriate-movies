@@ -6,7 +6,7 @@ module.exports = {
   },
   plugins: ['@typescript-eslint/eslint-plugin'],
   extends: [
-    'plugin:@typescript-eslint/eslint-recommended',
+    'airbnb-typescript/base',
     'plugin:@typescript-eslint/recommended',
     'prettier',
     'prettier/@typescript-eslint',
@@ -22,5 +22,9 @@ module.exports = {
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/no-empty-interface': 'off',
+    'import/prefer-default-export': 'off',
+    'max-classes-per-file': 'off',
+    'class-methods-use-this': 'warn',
+    'no-restricted-syntax': 'warn'
   },
 };
