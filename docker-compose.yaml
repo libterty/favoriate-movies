@@ -1,0 +1,44 @@
+version: "3"
+
+services:
+  database:
+    image: postgres:latest
+    container_name: movies-db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123
+      POSTGRES_DB: lib
+    ports:
+      - 35432:5432
+    volumes:
+      - movie_data:/var/lib/postgresql/data
+  server:
+    build: ./services
+    container_name: movies-server
+    command: sh -c "dockerize -wait tcp://database:5432 -timeout 300s -wait-retry-interval 10s npm run start:prod"
+    depends_on:
+      - database
+    environment:
+      APPHOST: localhost
+      APPPORT: 7080
+      DBHOST: database
+      DBPORT: 5432
+      DBUSERNAME: postgres
+      DBPASSWORD: 123
+      DBDATABASE: lib
+      DBSCHEMA: public
+      DBRATETABLE: movies
+    ports:
+      - 7080:7080
+  app:
+    build: ./apps
+    container_name: movies-app
+    depends_on:
+      - server
+    links:
+      - server
+
+volumes:
+  movie_data:
+    driver: local

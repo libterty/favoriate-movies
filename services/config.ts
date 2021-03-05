@@ -52,9 +52,9 @@ const configs = {
     NAME: packageNameGetter(),
     DESCRIPTION: packageDescriptionGetter(),
     // API
-    PREFIX: process.env.APPAPIPREFIX || '',
+    PREFIX: process.env.APPAPIPREFIX || 'v1',
     VERSION: packageVersionGetter(),
-    API_EXPLORER_PATH: process.env.APPAPIEXPLORERPATH || '',
+    API_EXPLORER_PATH: process.env.APPAPIEXPLORERPATH || '/api',
     // Server Setting
     HOST: process.env.APPHOST || 'localhost',
     PORT: process.env.APPPORT || 7080,
