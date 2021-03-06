@@ -14,7 +14,9 @@ import { config } from '../../config';
 @Injectable()
 export class UserService {
   private readonly httpResponse = new HTTPResponse();
+
   private readonly logger: Logger = new Logger('UserService');
+
   private readonly redisClient: Redis.Redis = new Redis(config.REDIS_URL);
 
   constructor(
@@ -100,7 +102,7 @@ export class UserService {
    * @returns {Promise<User>}
    */
   public async getUserById(id: string, payload: IUser.IUserInfo): Promise<IShare.IResponseBase<User | string>> {
-    const isAdmin: boolean = payload['role'] === EUser.EUserRole.ADMIN;
+    const isAdmin: boolean = payload.role === EUser.EUserRole.ADMIN;
     try {
       const user = await this.userRepository.getUserById(id, isAdmin);
       if (!user) return this.httpResponse.NotFoundError(`Cannot find user ${id}`);
