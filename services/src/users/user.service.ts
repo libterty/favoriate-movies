@@ -1,3 +1,4 @@
+import Redis from 'ioredis';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { JwtService } from '@nestjs/jwt';
@@ -7,12 +8,14 @@ import { UserCreditDto, SigninCreditDto } from './dtos';
 import HTTPResponse from '../libs/response';
 import * as IShare from '../shares/interfaces';
 import * as IUser from './interfaces';
+import * as EUser from './enums';
+import { config } from '../../config';
 
 @Injectable()
 export class UserService {
   private readonly httpResponse = new HTTPResponse();
-
   private readonly logger: Logger = new Logger('UserService');
+  private readonly redisClient: Redis.Redis = new Redis(config.REDIS_URL);
 
   constructor(
     @InjectRepository(UserRepository)
@@ -66,6 +69,60 @@ export class UserService {
       return this.httpResponse.StatusOK(accessToken);
     } catch (error) {
       this.logger.error(error.message, '', 'SignInServiceError');
+      return this.httpResponse.InternalServerError(error.message);
+    }
+  }
+
+  /**
+   * @description Get user information
+   * @public
+   * @param {IUser.IUserInfo} user
+   * @returns {IShare.IResponseBase<{ user: IUser.IUserInfo } | string>}
+   */
+  public getUser(user: IUser.IUserInfo): IShare.IResponseBase<{ user: IUser.IUserInfo } | string> {
+    if (!user) return this.httpResponse.UnAuthorizedError('No user existed');
+    return this.httpResponse.StatusOK({
+      user: {
+        id: user.id,
+        role: user.role,
+        username: user.username,
+        licence: user.licence || '11',
+        expiredDate: user.expiredDate,
+      },
+    });
+  }
+
+  /**
+   * @description Get User by id
+   * @public
+   * @param {string} id
+   * @param {IUser.IUserInfo} user
+   * @returns {Promise<User>}
+   */
+  public async getUserById(id: string, payload: IUser.IUserInfo): Promise<IShare.IResponseBase<User | string>> {
+    const isAdmin: boolean = payload['role'] === EUser.EUserRole.ADMIN;
+    try {
+      const user = await this.userRepository.getUserById(id, isAdmin);
+      if (!user) return this.httpResponse.NotFoundError(`Cannot find user ${id}`);
+      return this.httpResponse.StatusOK(user);
+    } catch (error) {
+      this.logger.error(error.message, '', 'GetUserByIdServiceError');
+      return this.httpResponse.InternalServerError(error.message);
+    }
+  }
+
+  /**
+   * @description Log out an user
+   * @public
+   * @param {string} token
+   * @returns {Promise<IShare.IResponseBase<string>>}
+   */
+  public async logOut(token: string): Promise<IShare.IResponseBase<string>> {
+    try {
+      await this.redisClient.lpush('blacklist', token);
+      return this.httpResponse.StatusOK('Logout success');
+    } catch (error) {
+      this.logger.error(error.message, '', 'LogOutServiceError');
       return this.httpResponse.InternalServerError(error.message);
     }
   }

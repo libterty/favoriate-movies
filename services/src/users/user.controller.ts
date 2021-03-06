@@ -1,8 +1,11 @@
-import { Controller, Get, Post, UsePipes, ValidationPipe, Body } from '@nestjs/common';
+import { Controller, Get, Post, UsePipes, ValidationPipe, Body, UseGuards, Headers, Param, ParseUUIDPipe } from '@nestjs/common';
 import { User } from './user.entitiy';
 import { UserService } from './user.service';
+import { CurrentUser } from './get-user.decorator';
 import { UserCreditDto, SigninCreditDto } from './dtos';
 import * as IShare from '../shares/interfaces';
+import * as IUser from './interfaces';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('/users')
 export class UserController {
@@ -12,6 +15,40 @@ export class UserController {
   @UsePipes(ValidationPipe)
   getRequest(): Promise<IShare.IResponseBase<string>> {
     return this.userService.getRequest();
+  }
+
+  /**
+   * @Routes Get user informations from receiving payload
+   * @param {IUser.IUserInfo} user
+   * @returns {IShare.IResponseBase<{ user: IUser.IUserInfo } | string>}
+   */
+  @Get('/info')
+  @UseGuards(AuthGuard(['jwt']))
+  getUser(@CurrentUser() user: IUser.IUserInfo): IShare.IResponseBase<{ user: IUser.IUserInfo } | string> {
+    return this.userService.getUser(user);
+  }
+
+  /**
+   * @Routes Logout an user
+   * @param {string} authorization
+   * @returns {Promise<IShare.IResponseBase<string>>}
+   */
+  @Get('/logout')
+  @UseGuards(AuthGuard(['jwt']))
+  logOut(@Headers('authorization') authorization: string): Promise<IShare.IResponseBase<string>> {
+    return this.userService.logOut(authorization);
+  }
+
+  /**
+   * @Routes Get an user by id
+   * @param {IUser.IUserInfo} user
+   * @param {string} id
+   * @returns {Promise<IShare.IResponseBase<User | string>>}
+   */
+  @Get('/:id/info')
+  @UseGuards(AuthGuard(['jwt']))
+  getUserById(@CurrentUser() user: IUser.IUserInfo, @Param('id', ParseUUIDPipe) id: string): Promise<IShare.IResponseBase<User | string>> {
+    return this.userService.getUserById(id, user);
   }
 
   /**

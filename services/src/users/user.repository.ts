@@ -1,9 +1,9 @@
 import { ConflictException, InternalServerErrorException, Logger } from '@nestjs/common';
-import { EntityManager, EntityRepository, getManager, Repository } from 'typeorm';
+import { EntityManager, EntityRepository, getManager, Not, Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { User } from './user.entitiy';
 import { UserCreditDto, SigninCreditDto } from './dtos';
-import * as IShare from '../shares/interfaces';
+import * as IUser from './interfaces';
 
 @EntityRepository(User)
 export class UserRepository extends Repository<User> {
@@ -39,7 +39,6 @@ export class UserRepository extends Repository<User> {
     } catch (error) {
       this.logger.error(error.message, '', 'SignUpRepoError');
       if (error.code === '23505') {
-        // throw 409 error when duplicate username
         throw new ConflictException(`Username: ${username} already exists`);
       } else {
         throw new InternalServerErrorException();
@@ -61,5 +60,34 @@ export class UserRepository extends Repository<User> {
       return user;
     }
     return null;
+  }
+
+  /**
+   * @description Get User By Id
+   * @public
+   * @param {string} id
+   * @param {boolean} isAdmin
+   * @returns {Promise<User>}
+   */
+  public async getUserById(id: string, isAdmin: boolean): Promise<User> {
+    try {
+      const findOpts: IUser.IFindOne = {
+        where: {
+          id,
+          status: true,
+        },
+      };
+      // only admin can view admin data
+      if (!isAdmin) findOpts.where.role = Not('admin');
+
+      const user: User = await this.findOne(findOpts);
+      if (!user) return null;
+      delete user.password;
+      delete user.salt;
+      return user;
+    } catch (error) {
+      this.logger.error(error.message, '', 'GetUserByIdRepoError');
+      throw new InternalServerErrorException(error.message);
+    }
   }
 }
