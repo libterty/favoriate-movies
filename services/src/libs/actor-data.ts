@@ -1,12 +1,11 @@
 /**
  * API Provider Based on https://www.back4app.com/database/paul-datasets/dataset-with-all-movies/get-started/node-js/rest-api/node-fetch?objectClassSlug=movies-list-api
  * Copyright (c) 2020, Back4App Inc. https://www.back4app.com/database
- * 
- * 
+ *
+ *
  * Additional inconsequential by @libterty
  * opyright (c) 2021, libterty https://github.com/libterty/favoriate-movies/blob/master/LICENCE
  */
-
 
 import { Logger } from '@nestjs/common';
 import fetch from 'node-fetch';
