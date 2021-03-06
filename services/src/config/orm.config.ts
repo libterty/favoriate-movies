@@ -1,5 +1,7 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { User } from '../users/user.entitiy';
+import { Movie } from '../movies/movie.entity';
+import { Actor } from '../actors/actor.entity';
 import { config } from '../../config';
 
 export const ormConfig: TypeOrmModuleOptions = {
@@ -9,7 +11,7 @@ export const ormConfig: TypeOrmModuleOptions = {
   username: config.DB_SETTINGS.username,
   password: config.DB_SETTINGS.password,
   database: config.DB_SETTINGS.database,
-  entities: [User],
+  entities: [User, Movie, Actor],
   migrations: [`${__dirname}./migration/*.ts`],
   synchronize: true,
 };
