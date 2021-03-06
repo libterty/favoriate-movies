@@ -1,6 +1,15 @@
 version: "3"
 
 services:
+  cachedb:
+    image: redis:alpine
+    container_name: movies-cache
+    environment:
+      - REDIS_DISABLE_COMMANDS=FLUSHDB,FLUSHALL
+    labels:
+      kompose.service.type: nodeport
+    ports:
+      - "6399:6379"
   database:
     image: postgres:latest
     container_name: movies-db
@@ -16,9 +25,10 @@ services:
   server:
     build: ./services
     container_name: movies-server
-    command: sh -c "dockerize -wait tcp://database:5432 -timeout 300s -wait-retry-interval 10s npm run start:prod"
+    command: sh -c "dockerize -wait tcp://database:5432 -wait tcp://cachedb:6379 -timeout 300s -wait-retry-interval 10s npm run start:prod"
     depends_on:
       - database
+      - cachedb
     environment:
       APPHOST: localhost
       APPPORT: 7080
@@ -29,6 +39,7 @@ services:
       DBDATABASE: lib
       DBSCHEMA: public
       DBRATETABLE: movies
+      REDIS_URL: tcp://cachedb:6379
     ports:
       - 7080:7080
   app:
