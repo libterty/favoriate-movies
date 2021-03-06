@@ -1,4 +1,4 @@
-import * as EUser from '../enums';
+import * as EUser from '../../shares/enums';
 
 export interface IUserInfo {
   id?: string;
