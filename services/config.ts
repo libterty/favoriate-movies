@@ -59,15 +59,22 @@ const configs = {
     HOST: process.env.APPHOST || 'localhost',
     PORT: process.env.APPPORT || 7080,
 
+    JWT: {
+      KEY: process.env.JWTKEY || 'lib',
+      SECRET: process.env.JWTSECRET || 'lib',
+    },
+
     DB_SETTINGS: {
       host: process.env.DBHOST || 'localhost',
       port: process.env.DBPORT || 5432,
       username: process.env.DBUSERNAME || 'postgres',
       password: process.env.DBPASSWORD || '123',
-      database: process.env.DBDATABASE || 'lib',
+      database: process.env.DBDATABASE || 'movies',
       schema: process.env.DBSCHEMA || 'public',
       userTable: process.env.DBRATETABLE || 'movies',
     },
+
+    REDIS_URL: process.env.REDIS_URL || "redis://127.0.0.1:6379",
   },
   development: {},
   production: {
