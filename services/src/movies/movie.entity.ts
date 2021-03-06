@@ -36,7 +36,7 @@ export class Movie extends BaseEntity {
     { nullable: true },
   )
   @JoinColumn()
-  actors: Actor[];
+  actors?: Actor[];
 
   /**
    * @description Relation with users

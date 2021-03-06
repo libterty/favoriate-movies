@@ -21,7 +21,7 @@ export class Actor extends BaseEntity {
     { nullable: true },
   )
   @JoinColumn()
-  movies: Movie[];
+  movies?: Movie[];
 
   @BeforeInsert()
   updateWhenInsert() {

@@ -27,5 +27,7 @@ module.exports = {
     'class-methods-use-this': 'off',
     'no-restricted-syntax': 'off',
     'import/no-cycle': 'off',
+    'no-plusplus': 'off',
+    'no-await-in-loop': 'off'
   },
 };
