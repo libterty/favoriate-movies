@@ -1,5 +1,7 @@
-import { Entity, BaseEntity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, BeforeInsert, BeforeUpdate, JoinColumn, ManyToMany, AfterLoad } from 'typeorm';
+import { Entity, BaseEntity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, BeforeInsert, BeforeUpdate, JoinColumn, ManyToMany, AfterLoad, ManyToOne } from 'typeorm';
 import { User } from '../users/user.entitiy';
+import { Actor } from '../actors/actor.entity';
+import * as EMovie from './enums';
 
 @Entity()
 export class Movie extends BaseEntity {
@@ -14,6 +16,27 @@ export class Movie extends BaseEntity {
 
   @Column({ type: 'varchar', nullable: true })
   image?: string;
+
+  @Column({ type: 'varchar', nullable: false })
+  director: string;
+
+  @Column({
+    type: 'enum',
+    enum: EMovie.EMovieTypes,
+    nullable: false,
+  })
+  genre: EMovie.EMovieTypes;
+
+  /**
+   * @description Relation with actors
+   */
+  @ManyToMany(
+    () => Actor,
+    (actor) => actor.movies,
+    { nullable: true },
+  )
+  @JoinColumn()
+  actors: Actor[];
 
   /**
    * @description Relation with users
