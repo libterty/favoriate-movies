@@ -14,7 +14,7 @@ export default class RoleGuard implements CanActivate {
    */
   canActivate(ctx: ExecutionContext): boolean {
     const roles = this.reflector.get<string[]>('roles', ctx.getHandler());
-    const { role } = ctx.switchToHttp().getRequest<Request>().user;
+    const role = ctx.switchToHttp().getRequest<Request>().user['role'];
 
     // Grant all acess to admin
     if (role === EUser.EUserRole.ADMIN) return true;
