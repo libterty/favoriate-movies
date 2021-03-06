@@ -33,15 +33,10 @@ export class UserService {
    * @param {UserCreditDto} userCreditDto
    * @returns {Promise<IShare.IResponseBase<User | string>>}
    */
-  public async signUp(
-    userCreditDto: UserCreditDto,
-  ): Promise<IShare.IResponseBase<User | string>> {
+  public async signUp(userCreditDto: UserCreditDto): Promise<IShare.IResponseBase<User | string>> {
     try {
       const user = await this.userRepository.signUp(userCreditDto);
-      if (!user)
-        return this.httpResponse.InternalServerError(
-          `User ${userCreditDto.username} create fail`,
-        );
+      if (!user) return this.httpResponse.InternalServerError(`User ${userCreditDto.username} create fail`);
       delete user.password;
       delete user.salt;
       return this.httpResponse.StatusCreated(user);
@@ -57,9 +52,7 @@ export class UserService {
    * @param {SigninCreditDto} signinCreditDto
    * @returns {Promise<IShare.IResponseBase<string>>}
    */
-  public async signIn(
-    signinCreditDto: SigninCreditDto,
-  ): Promise<IShare.IResponseBase<string>> {
+  public async signIn(signinCreditDto: SigninCreditDto): Promise<IShare.IResponseBase<string>> {
     try {
       const user = await this.userRepository.signIn(signinCreditDto);
       if (!user) return this.httpResponse.UnAuthorizedError('Invalid request');

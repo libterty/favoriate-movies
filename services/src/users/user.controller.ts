@@ -1,11 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  UsePipes,
-  ValidationPipe,
-  Body,
-} from '@nestjs/common';
+import { Controller, Get, Post, UsePipes, ValidationPipe, Body } from '@nestjs/common';
 import { User } from './user.entitiy';
 import { UserService } from './user.service';
 import { UserCreditDto, SigninCreditDto } from './dtos';
@@ -27,9 +20,7 @@ export class UserController {
    * @returns {Promise<IShare.IResponseBase<User | string>>}
    */
   @Post('/signup')
-  signUp(
-    @Body(ValidationPipe) userCreditDto: UserCreditDto,
-  ): Promise<IShare.IResponseBase<User | string>> {
+  signUp(@Body(ValidationPipe) userCreditDto: UserCreditDto): Promise<IShare.IResponseBase<User | string>> {
     return this.userService.signUp(userCreditDto);
   }
 
@@ -39,9 +30,7 @@ export class UserController {
    * @returns {Promise<IShare.IResponseBase<string>>}
    */
   @Post('/signin')
-  signIn(
-    @Body(ValidationPipe) signinCreditDto: SigninCreditDto,
-  ): Promise<IShare.IResponseBase<string>> {
+  signIn(@Body(ValidationPipe) signinCreditDto: SigninCreditDto): Promise<IShare.IResponseBase<string>> {
     return this.userService.signIn(signinCreditDto);
   }
 }
