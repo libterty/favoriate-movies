@@ -1,7 +1,7 @@
 import { BaseEntity, Column, CreateDateColumn, UpdateDateColumn, Entity, Index, PrimaryGeneratedColumn, BeforeInsert, BeforeUpdate, ManyToMany, JoinColumn } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { Movie } from '../movies/movie.entity';
-import * as EUser from './enums';
+import * as EUser from '../shares/enums';
 
 @Entity()
 export class User extends BaseEntity {

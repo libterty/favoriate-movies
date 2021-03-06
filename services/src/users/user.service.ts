@@ -8,7 +8,7 @@ import { UserCreditDto, SigninCreditDto } from './dtos';
 import HTTPResponse from '../libs/response';
 import * as IShare from '../shares/interfaces';
 import * as IUser from './interfaces';
-import * as EUser from './enums';
+import * as EUser from '../shares/enums';
 import { config } from '../../config';
 
 @Injectable()
