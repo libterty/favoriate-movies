@@ -1,5 +1,6 @@
-import { BaseEntity, Column, CreateDateColumn, UpdateDateColumn, Entity, Index, PrimaryGeneratedColumn, BeforeInsert, BeforeUpdate } from 'typeorm';
+import { BaseEntity, Column, CreateDateColumn, UpdateDateColumn, Entity, Index, PrimaryGeneratedColumn, BeforeInsert, BeforeUpdate, ManyToMany, JoinColumn } from 'typeorm';
 import * as bcrypt from 'bcrypt';
+import { Movie } from '../movies/movie.entity';
 import * as EUser from './enums';
 
 @Entity()
@@ -37,6 +38,23 @@ export class User extends BaseEntity {
    */
   @Column({ type: 'boolean', default: true })
   status: boolean;
+
+  /**
+   * @description Relation with movies
+   */
+  @ManyToMany(
+    () => Movie,
+    (movie) => movie.rateUsers,
+  )
+  @JoinColumn()
+  rateMovies: Movie[];
+
+  @ManyToMany(
+    () => Movie,
+    (movie) => movie.contributors,
+  )
+  @JoinColumn()
+  contributings: Movie[];
 
   /**
    * @description Time area
