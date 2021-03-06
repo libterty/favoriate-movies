@@ -1,4 +1,5 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { User } from '../users/user.entitiy';
 import { config } from '../../config';
 
 export const ormConfig: TypeOrmModuleOptions = {
@@ -8,7 +9,7 @@ export const ormConfig: TypeOrmModuleOptions = {
   username: config.DB_SETTINGS.username,
   password: config.DB_SETTINGS.password,
   database: config.DB_SETTINGS.database,
-  entities: [`${__dirname}/../**/*.entity.{js,ts}`],
+  entities: [User],
   migrations: [`${__dirname}./migration/*.ts`],
   synchronize: true,
 };

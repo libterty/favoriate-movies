@@ -24,7 +24,7 @@ module.exports = {
     '@typescript-eslint/no-empty-interface': 'off',
     'import/prefer-default-export': 'off',
     'max-classes-per-file': 'off',
-    'class-methods-use-this': 'warn',
-    'no-restricted-syntax': 'warn'
+    'class-methods-use-this': 'off',
+    'no-restricted-syntax': 'off'
   },
 };
