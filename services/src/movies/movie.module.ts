@@ -7,10 +7,10 @@ import { ActorRepository } from '../actors/actor.repository';
 import { MovieService } from './movie.service';
 import { MovieController } from './movie.controller';
 import { UploaderService } from '../uploaders/uploader.service';
-
+import { EventGateway } from '../events/event.gateway';
 @Module({
   imports: [MulterModule.register(), TypeOrmModule.forFeature([MovieRepository, UserRepository, ActorRepository])],
   controllers: [MovieController],
-  providers: [MovieService, UploaderService],
+  providers: [MovieService, UploaderService, EventGateway],
 })
 export class MovieModule {}
