@@ -1,11 +1,11 @@
-import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Movie } from './movie.entity';
 import { UserRepository } from '../users/user.repository';
 import { MovieRepository } from './movie.repository';
 import { ActorRepository } from '../actors/actor.repository';
 import { UploaderService } from '../uploaders/uploader.service';
-import { CreateMovieDto } from './dtos';
+import { CreateMovieDto, GetMovieByIdDto } from './dtos';
 import HTTPResponse from '../libs/response';
 import * as EShare from '../shares/enums';
 import * as IShare from '../shares/interfaces';
@@ -36,13 +36,13 @@ export class MovieService {
    * @param {CreateMovieDto} createMovieDto
    * @returns {Promise<IShare.IResponseBase<Movie | string>>}
    */
-  public async createMovie(user: IUser.IUserInfo | IUser.JwtPayload, createMovieFileDto: IMovie.BufferedFile, createMovieDto: CreateMovieDto): Promise<IShare.IResponseBase<Movie | string>> {
+  public async createMovie(user: IUser.IUserInfo | IUser.JwtPayload, createMovieFileDto: IMovie.BufferedFile, createMovieDto: CreateMovieDto): Promise<IShare.IResponseBase<Movie | string> | HttpException> {
     try {
       // check if user is existed
       const isAdmin: boolean = user.role === EShare.EUserRole.ADMIN;
       const findUser = await this.userRepository.getUserById(user.id, isAdmin);
       if (!findUser) {
-        throw new HttpException(
+        return new HttpException(
           {
             status: HttpStatus.FORBIDDEN,
             error: 'Invalid user',
@@ -57,7 +57,8 @@ export class MovieService {
       const movie = await this.movieRepository.createMovie(findUser, actors, createMovieDto);
       // `Movie ${createMovieDto.name} create Failed`
       if (!movie) {
-        throw new HttpException(
+        this.logger.error(`Movie ${createMovieDto.name} create Failed`, '', 'CreateMovieServiceError');
+        return new HttpException(
           {
             status: HttpStatus.CONFLICT,
             error: `Movie ${createMovieDto.name} create Failed`,
@@ -68,6 +69,38 @@ export class MovieService {
       return this.httpResponse.StatusCreated(movie);
     } catch (error) {
       this.logger.error(error.message, '', 'CreateMovieServiceError');
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: error.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  /**
+   * @description Get movie by id dto
+   * @public
+   * @param {GetMovieByIdDto} getMovieByIdDto
+   * @returns {Promise<IShare.IResponseBase<Movie | string> | HttpException>}
+   */
+  public async getMovieById(getMovieByIdDto: GetMovieByIdDto): Promise<IShare.IResponseBase<Movie | string> | HttpException> {
+    try {
+      const movie = await this.movieRepository.getMovieById(getMovieByIdDto);
+      if (!movie) {
+        this.logger.error(`Movie ${getMovieByIdDto.id} not found`, '', 'GetMovieByIdServiceError');
+        return new HttpException(
+          {
+            status: HttpStatus.NOT_FOUND,
+            error: `Movie ${getMovieByIdDto.id} not found`,
+          },
+          HttpStatus.NOT_FOUND,
+        );
+      }
+      return this.httpResponse.StatusOK(movie);
+    } catch (error) {
+      this.logger.error(error.message, '', 'GetMovieByIdServiceError');
       throw new HttpException(
         {
           status: HttpStatus.INTERNAL_SERVER_ERROR,

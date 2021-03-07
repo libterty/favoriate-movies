@@ -18,9 +18,8 @@ export class Actor extends BaseEntity {
   @ManyToMany(
     () => Movie,
     (movie) => movie.actors,
-    { nullable: true },
   )
-  movies?: Movie[];
+  movies: Movie[];
 
   @BeforeInsert()
   updateWhenInsert() {

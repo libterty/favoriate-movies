@@ -37,10 +37,9 @@ export class Movie extends BaseEntity {
   @ManyToMany(
     () => Actor,
     (actor) => actor.movies,
-    { nullable: true },
   )
   @JoinTable()
-  actors?: Actor[];
+  actors: Actor[];
 
   /**
    * @description Relation with users

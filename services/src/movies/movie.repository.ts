@@ -1,9 +1,9 @@
-import { ConflictException, InternalServerErrorException, Logger } from '@nestjs/common';
+import { ConflictException, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
 import { EntityManager, EntityRepository, getManager, Repository } from 'typeorm';
 import { User } from '../users/user.entitiy';
 import { Movie } from './movie.entity';
 import { Actor } from '../actors/actor.entity';
-import { CreateMovieDto } from './dtos';
+import { CreateMovieDto, GetMovieByIdDto } from './dtos';
 
 @EntityRepository(Movie)
 export class MovieRepository extends Repository<Movie> {
@@ -54,9 +54,28 @@ export class MovieRepository extends Repository<Movie> {
       if (error.code === '23505') {
         throw new ConflictException(`Movie name: ${name} already exists`);
       } else {
-        throw new InternalServerErrorException();
+        throw new InternalServerErrorException(error.message);
       }
     }
     return movie;
+  }
+
+  /**
+   * @description Get movie by id
+   * @public
+   * @param {GetMovieByIdDto} getMovieByIdDto
+   * @returns {Promise<Movie>}
+   */
+  public async getMovieById(getMovieByIdDto: GetMovieByIdDto): Promise<Movie> {
+    try {
+      return await this.findOne({
+        relations: ['actors', 'rateUsers', 'contributors'],
+        where: {
+          id: getMovieByIdDto.id,
+        },
+      });
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
   }
 }
