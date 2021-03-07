@@ -5,7 +5,7 @@ import { UserRepository } from '../users/user.repository';
 import { MovieRepository } from './movie.repository';
 import { ActorRepository } from '../actors/actor.repository';
 import { UploaderService } from '../uploaders/uploader.service';
-import { CreateMovieDto, GetMovieByIdDto } from './dtos';
+import { CreateMovieDto, GetMovieByIdDto, UpdateMovieByIdDto } from './dtos';
 import HTTPResponse from '../libs/response';
 import * as DShare from '../shares/dtos';
 import * as EShare from '../shares/enums';
@@ -146,6 +146,54 @@ export class MovieService {
       });
     } catch (error) {
       this.logger.error(error.message, '', 'GetMoviesWithPagingServiceError');
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: error.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  /**
+   * @description Update movie by id
+   * @public
+   * @param {IUser.IUserInfo | IUser.JwtPayload} user
+   * @param {GetMovieByIdDto} getMovieByIdDto
+   * @param {UpdateMovieByIdDto} updateMovieByIdDto
+   * @returns {Promise<IShare.IResponseBase<Movie | string> | HttpException>}
+   */
+  public async updateMovie(user: IUser.IUserInfo | IUser.JwtPayload, getMovieByIdDto: GetMovieByIdDto, updateMovieByIdDto: UpdateMovieByIdDto): Promise<IShare.IResponseBase<Movie | string> | HttpException> {
+    try {
+      // check if user is existed
+      const isAdmin: boolean = user.role === EShare.EUserRole.ADMIN;
+      const findUser = await this.userRepository.getUserById(user.id, isAdmin);
+      if (!findUser) {
+        return new HttpException(
+          {
+            status: HttpStatus.FORBIDDEN,
+            error: 'Invalid user',
+          },
+          HttpStatus.FORBIDDEN,
+        );
+      }
+      // check actors if not found is empty list
+      const actors = await this.actorRepository.getRelationActors(updateMovieByIdDto.actors);
+      const updateMovie = await this.movieRepository.updateMovie(findUser, actors, getMovieByIdDto, updateMovieByIdDto);
+      if (!updateMovie) {
+        this.logger.error(`Movie ${updateMovieByIdDto.name} update conflict`, '', 'CreateMovieServiceError');
+        return new HttpException(
+          {
+            status: HttpStatus.CONFLICT,
+            error: `Movie ${updateMovieByIdDto.name} update conflict`,
+          },
+          HttpStatus.CONFLICT,
+        );
+      }
+      return this.httpResponse.StatusOK(updateMovie);
+    } catch (error) {
+      this.logger.error(error.message, '', 'UpdateMovieServiceError');
       throw new HttpException(
         {
           status: HttpStatus.INTERNAL_SERVER_ERROR,
