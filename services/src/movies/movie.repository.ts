@@ -3,10 +3,11 @@ import { EntityManager, EntityRepository, getManager, Like, Repository } from 't
 import { User } from '../users/user.entitiy';
 import { Movie } from './movie.entity';
 import { Actor } from '../actors/actor.entity';
-import { CreateMovieDto, GetMovieByIdDto } from './dtos';
+import { CreateMovieDto, GetMovieByIdDto, UpdateMovieByIdDto, RemoveMovieByIdDto } from './dtos';
 import * as DShare from '../shares/dtos';
 import * as IShare from '../shares/interfaces';
 import * as IMovie from './interfaces';
+import { isEmptyObj } from '../libs/utils';
 
 @EntityRepository(Movie)
 export class MovieRepository extends Repository<Movie> {
@@ -52,7 +53,6 @@ export class MovieRepository extends Repository<Movie> {
     try {
       await movie.save();
     } catch (error) {
-      console.error(error);
       this.logger.error(error.message, '', 'createMovieRepoError');
       if (error.code === '23505') {
         throw new ConflictException(`Movie name: ${name} already exists`);
@@ -71,12 +71,22 @@ export class MovieRepository extends Repository<Movie> {
    */
   public async getMovieById(getMovieByIdDto: GetMovieByIdDto): Promise<Movie> {
     try {
-      return await this.findOne({
+      const movie = await this.findOne({
         relations: ['actors', 'rateUsers', 'contributors'],
         where: {
           id: getMovieByIdDto.id,
         },
       });
+      if (!movie) return null;
+      movie.rateUsers.forEach((user) => {
+        delete user.password;
+        delete user.salt;
+      });
+      movie.contributors.forEach((user) => {
+        delete user.password;
+        delete user.salt;
+      });
+      return movie;
     } catch (error) {
       throw new InternalServerErrorException(error.message);
     }
@@ -114,6 +124,81 @@ export class MovieRepository extends Repository<Movie> {
       };
     } catch (error) {
       this.logger.error(error.message, '', 'GetMoviesWithPagingRepoError');
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  /**
+   * @description Handle rate updates when new contributors submit rate
+   * @private
+   * @param {User} user
+   * @param {Movie} movie
+   * @param {number} newRatings
+   * @returns {Movie}
+   */
+  private handleRateUpdates(user: User, movie: Movie, newRatings: number): Movie {
+    let isExistedRaters = false;
+    movie.rateUsers.forEach((rateUser) => {
+      if (rateUser.id === user.id) isExistedRaters = true;
+    });
+    if (!isExistedRaters) {
+      // O(1) operation for list like
+      movie.rateUsers.push(user);
+
+      movie.ratings = (movie.ratings + newRatings) / movie.rateUsers.length;
+    }
+    return movie;
+  }
+
+  /**
+   * @description Update movie by id
+   * @public
+   * @param {User} user
+   * @param {Actor[]} newActors
+   * @param {GetMovieByIdDto} getMovieByIdDto
+   * @param {UpdateMovieByIdDto} updateMovieByIdDto
+   * @returns {Promise<Movie>}
+   */
+  public async updateMovie(user: User, newActors: Actor[], getMovieByIdDto: GetMovieByIdDto, updateMovieByIdDto: UpdateMovieByIdDto): Promise<Movie> {
+    const { name, desc, ratings, director, genre, actors } = updateMovieByIdDto;
+    let movie = await this.getMovieById(getMovieByIdDto);
+    if (!movie) return null;
+
+    if (name) movie.name = name;
+    if (desc) movie.desc = desc;
+    if (ratings) movie = this.handleRateUpdates(user, movie, ratings);
+    if (director) movie.director = director;
+    if (genre) movie.genre = genre;
+    if (actors) movie.actors = newActors;
+    if (user && !isEmptyObj(updateMovieByIdDto)) movie.contributors.push(user);
+
+    try {
+      await movie.save();
+    } catch (error) {
+      this.logger.error(error.message, '', 'UpdateMovieRepoError');
+      if (error.code === '23505') {
+        throw new ConflictException(`Movie name: ${name} already exists`);
+      } else {
+        throw new InternalServerErrorException(error.message);
+      }
+    }
+    return movie;
+  }
+
+  /**
+   * @description Soft remove movie by id
+   * @public
+   * @param {RemoveMovieByIdDto} removeMovieByIdDto
+   * @returns {Promise<boolean>}
+   */
+  public async removeMovie(removeMovieByIdDto: RemoveMovieByIdDto): Promise<boolean> {
+    try {
+      const movie = await this.getMovieById(removeMovieByIdDto);
+      const delResult = await movie.softRemove();
+      if (!delResult) return false;
+      return true;
+    } catch (error) {
+      this.logger.error(error.message, '', 'RemoveMovieRepoError');
       throw new InternalServerErrorException(error.message);
     }
   }

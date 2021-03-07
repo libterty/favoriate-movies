@@ -1,4 +1,4 @@
-import { IsArray, IsEnum, IsInstance, IsNumberString, IsOptional, IsString, IsUUID } from 'class-validator';
+import { IsArray, IsEnum, IsInstance, IsNumber, IsNumberString, IsOptional, IsString, IsUUID } from 'class-validator';
 import * as EMovie from '../enums';
 
 class GetMovieBaseDto {
@@ -31,3 +31,31 @@ export class CreateMovieDto {
 }
 
 export class GetMovieByIdDto extends GetMovieBaseDto {}
+
+export class UpdateMovieByIdDto {
+  @IsOptional()
+  @IsString()
+  name?: string;
+
+  @IsOptional()
+  @IsString()
+  desc?: string;
+
+  @IsOptional()
+  @IsNumber()
+  ratings?: number;
+
+  @IsOptional()
+  @IsString()
+  director?: string;
+
+  @IsOptional()
+  @IsEnum(EMovie.EMovieTypes)
+  genre: EMovie.EMovieTypes;
+
+  @IsOptional()
+  @IsArray()
+  actors?: string[];
+}
+
+export class RemoveMovieByIdDto extends GetMovieBaseDto {}

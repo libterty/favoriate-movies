@@ -1,4 +1,4 @@
-import { Entity, BaseEntity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, BeforeInsert, BeforeUpdate, ManyToMany, Index, JoinTable } from 'typeorm';
+import { Entity, BaseEntity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, DeleteDateColumn, BeforeInsert, BeforeUpdate, ManyToMany, Index, JoinTable } from 'typeorm';
 import { User } from '../users/user.entitiy';
 import { Actor } from '../actors/actor.entity';
 import * as EMovie from './enums';
@@ -66,6 +66,9 @@ export class Movie extends BaseEntity {
 
   @UpdateDateColumn({ type: 'timestamp', nullable: false })
   updatedAt: Date;
+
+  @DeleteDateColumn({ type: 'timestamp', nullable: true })
+  deletedAt?: Date;
 
   @BeforeInsert()
   updateWhenInsert() {
