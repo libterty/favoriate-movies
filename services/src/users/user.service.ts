@@ -36,14 +36,14 @@ export class UserService {
    * @description Sign up user service action
    * @public
    * @param {UserCreditDto} userCreditDto
-   * @returns {Promise<IShare.IResponseBase<User | string>>}
+   * @returns {Promise<IShare.IResponseBase<User | string> | HttpException>}
    */
-  public async signUp(userCreditDto: UserCreditDto): Promise<IShare.IResponseBase<User | string>> {
+  public async signUp(userCreditDto: UserCreditDto): Promise<IShare.IResponseBase<User | string> | HttpException> {
     try {
       const user = await this.userRepository.signUp(userCreditDto);
       if (!user) {
         this.logger.error(`User ${userCreditDto.username} create fail`, '', 'SignUpServiceError');
-        throw new HttpException(
+        return new HttpException(
           {
             status: HttpStatus.CONFLICT,
             error: `User ${userCreditDto.username} create fail`,
@@ -70,14 +70,14 @@ export class UserService {
    * @description Sign in user service action
    * @public
    * @param {SigninCreditDto} signinCreditDto
-   * @returns {Promise<IShare.IResponseBase<string>>}
+   * @returns {Promise<IShare.IResponseBase<string> | HttpException>}
    */
-  public async signIn(signinCreditDto: SigninCreditDto): Promise<IShare.IResponseBase<string>> {
+  public async signIn(signinCreditDto: SigninCreditDto): Promise<IShare.IResponseBase<string> | HttpException> {
     try {
       const user = await this.userRepository.signIn(signinCreditDto);
       if (!user) {
         this.logger.error('Invalid request', '', 'SignInServiceError');
-        throw new HttpException(
+        return new HttpException(
           {
             status: HttpStatus.UNAUTHORIZED,
             error: 'Invalid request',
@@ -109,12 +109,12 @@ export class UserService {
    * @description Get user information
    * @public
    * @param {IUser.IUserInfo} user
-   * @returns {IShare.IResponseBase<{ user: IUser.IUserInfo } | string>}
+   * @returns {IShare.IResponseBase<{ user: IUser.IUserInfo } | string > | HttpException}
    */
-  public getUser(user: IUser.IUserInfo): IShare.IResponseBase<{ user: IUser.IUserInfo } | string> {
+  public getUser(user: IUser.IUserInfo): IShare.IResponseBase<{ user: IUser.IUserInfo } | string> | HttpException {
     if (!user) {
       this.logger.error('No user existed', '', 'GetUserServiceError');
-      throw new HttpException(
+      return new HttpException(
         {
           status: HttpStatus.UNAUTHORIZED,
           error: 'No user existed',
@@ -138,15 +138,15 @@ export class UserService {
    * @public
    * @param {string} id
    * @param {IUser.IUserInfo} user
-   * @returns {Promise<User>}
+   * @returns {Promise<IShare.IResponseBase<User | string> | HttpException>}
    */
-  public async getUserById(id: string, payload: IUser.IUserInfo): Promise<IShare.IResponseBase<User | string>> {
+  public async getUserById(id: string, payload: IUser.IUserInfo): Promise<IShare.IResponseBase<User | string> | HttpException> {
     const isAdmin: boolean = payload.role === EUser.EUserRole.ADMIN;
     try {
       const user = await this.userRepository.getUserById(id, isAdmin);
       if (!user) {
         this.logger.error(`Cannot find user ${id}`, '', 'GetUserByIdServiceError');
-        throw new HttpException(
+        return new HttpException(
           {
             status: HttpStatus.NOT_FOUND,
             error: `Cannot find user ${id}`,
