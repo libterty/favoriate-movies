@@ -24,8 +24,6 @@ export class MovieController {
    * @returns {Promise<IShare.IResponseBase<IMovie.IPagingQueryResponse<Movie[]> | string> | HttpException>}
    */
   @Get('/paging')
-  @SetMetadata('roles', [EShare.EUserRole.USER, EShare.EUserRole.ADMIN])
-  @UseGuards(AuthGuard(['jwt']), RoleGuard)
   getActors(@Query(ValidationPipe) searchDto: DShare.PagingSearchDto): Promise<IShare.IResponseBase<IMovie.IPagingQueryResponse<Movie[]> | string> | HttpException> {
     return this.movieService.getMoviesWithPaging(searchDto);
   }
@@ -37,8 +35,6 @@ export class MovieController {
    * @returns {Promise<IShare.IResponseBase<Movie | string> | HttpException>}
    */
   @Get('/:id/info')
-  @SetMetadata('roles', [EShare.EUserRole.USER, EShare.EUserRole.ADMIN])
-  @UseGuards(AuthGuard(['jwt']), RoleGuard)
   getMovieById(@Param(ValidationPipe) getMovieByIdDto: GetMovieByIdDto): Promise<IShare.IResponseBase<Movie | string> | HttpException> {
     return this.movieService.getMovieById(getMovieByIdDto);
   }
