@@ -38,7 +38,7 @@ export class UploaderService {
     return new Promise((resolve, reject) => {
       return fs.createWriteStream(join(process.cwd(), `public/assets/${createMovieFileDto.originalname}`)).write(Buffer.from(createMovieFileDto.buffer), (err) => {
         if (err) return reject(err.message);
-        return resolve(`public/assets/${createMovieFileDto.originalname}`);
+        return resolve(`${createMovieFileDto.originalname}`);
       });
     });
   }
