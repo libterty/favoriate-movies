@@ -1,9 +1,12 @@
 import { ConflictException, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
-import { EntityManager, EntityRepository, getManager, Repository } from 'typeorm';
+import { EntityManager, EntityRepository, getManager, Like, Repository } from 'typeorm';
 import { User } from '../users/user.entitiy';
 import { Movie } from './movie.entity';
 import { Actor } from '../actors/actor.entity';
 import { CreateMovieDto, GetMovieByIdDto } from './dtos';
+import * as DShare from '../shares/dtos';
+import * as IShare from '../shares/interfaces';
+import * as IMovie from './interfaces';
 
 @EntityRepository(Movie)
 export class MovieRepository extends Repository<Movie> {
@@ -75,6 +78,42 @@ export class MovieRepository extends Repository<Movie> {
         },
       });
     } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  /**
+   * @description Get movies by paging and keywords
+   * @public
+   * @param {DShare.PagingSearchDto} searchDto
+   * @returns {Promise<IMovie.IPagingQueryResponse<Movie[]>>}
+   */
+  public async getMoviesWithPaging(searchDto: DShare.PagingSearchDto): Promise<IMovie.IPagingQueryResponse<Movie[]>> {
+    const searchOpts: IShare.IQueryPaging = {
+      take: Number(searchDto.take),
+      skip: Number(searchDto.skip),
+      order: {
+        updatedAt: searchDto.sort,
+      },
+      relations: ['actors', 'rateUsers', 'contributors'],
+      where: {},
+    };
+
+    // keyword searching for movie name
+    if (searchDto.keyword.length > 0) {
+      searchOpts.where.name = Like(`%${searchDto.keyword}%`);
+    }
+
+    try {
+      const [movies, count] = await this.repoManager.findAndCount(Movie, searchOpts);
+      return {
+        movies,
+        take: Number(searchDto.take),
+        skip: Number(searchDto.skip),
+        count,
+      };
+    } catch (error) {
+      this.logger.error(error.message, '', 'GetMoviesWithPagingRepoError');
       throw new InternalServerErrorException(error.message);
     }
   }

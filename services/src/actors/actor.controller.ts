@@ -1,4 +1,4 @@
-import { Controller, Get, Query, SetMetadata, UseGuards, ValidationPipe } from '@nestjs/common';
+import { Controller, Get, HttpException, Query, SetMetadata, UseGuards, ValidationPipe } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import RoleGuard from '../guards/local-guard';
 import { Actor } from './actor.entity';
@@ -16,12 +16,12 @@ export class ActorController {
    * @Routes Get actors with paging and keyword search
    * @Get
    * @param {DShare.PagingSearchDto} searchDto
-   * @returns {Promise<IShare.IResponseBase<User | string>>}
+   * @returns {Promise<IShare.IResponseBase<IActor.IPagingQueryResponse<Actor[]> | string> | HttpException>}
    */
   @Get('/paging')
   @SetMetadata('roles', [EShare.EUserRole.USER, EShare.EUserRole.ADMIN])
   @UseGuards(AuthGuard(['jwt']), RoleGuard)
-  getActors(@Query(ValidationPipe) searchDto: DShare.PagingSearchDto): Promise<IShare.IResponseBase<IActor.IPagingQueryResponse<Actor[]> | string>> {
+  getActors(@Query(ValidationPipe) searchDto: DShare.PagingSearchDto): Promise<IShare.IResponseBase<IActor.IPagingQueryResponse<Actor[]> | string> | HttpException> {
     return this.actorService.getActors(searchDto);
   }
 }

@@ -7,6 +7,7 @@ import { ActorRepository } from '../actors/actor.repository';
 import { UploaderService } from '../uploaders/uploader.service';
 import { CreateMovieDto, GetMovieByIdDto } from './dtos';
 import HTTPResponse from '../libs/response';
+import * as DShare from '../shares/dtos';
 import * as EShare from '../shares/enums';
 import * as IShare from '../shares/interfaces';
 import * as IUser from '../users/interfaces';
@@ -101,6 +102,50 @@ export class MovieService {
       return this.httpResponse.StatusOK(movie);
     } catch (error) {
       this.logger.error(error.message, '', 'GetMovieByIdServiceError');
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: error.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  /**
+   * @description Get movies by paging and keywords
+   * @public
+   * @param {DShare.PagingSearchDto} searchDto
+   * @returns {Promise<IShare.IResponseBase<IMovie.IPagingQueryResponse<Movie[]> | string> | HttpException>}
+   */
+  public async getMoviesWithPaging(searchDto: DShare.PagingSearchDto): Promise<IShare.IResponseBase<IMovie.IPagingQueryResponse<Movie[]> | string> | HttpException> {
+    if (!searchDto.take) searchDto.take = 10;
+    if (!searchDto.skip) searchDto.skip = 0;
+    if (!searchDto.keyword) searchDto.keyword = '';
+    if (!searchDto.sort) searchDto.sort = EShare.ESort.DESC;
+
+    try {
+      const { movies, take, skip, count } = await this.movieRepository.getMoviesWithPaging(searchDto);
+
+      if (!movies || !count) {
+        this.logger.error('No movie records has been found', '', 'GetMoviesWithPagingServiceError');
+        return new HttpException(
+          {
+            status: HttpStatus.NOT_FOUND,
+            error: 'No movie records has been found',
+          },
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
+      return this.httpResponse.StatusOK({
+        movies,
+        take,
+        skip,
+        count,
+      });
+    } catch (error) {
+      this.logger.error(error.message, '', 'GetMoviesWithPagingServiceError');
       throw new HttpException(
         {
           status: HttpStatus.INTERNAL_SERVER_ERROR,

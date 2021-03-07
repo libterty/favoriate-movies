@@ -25,7 +25,7 @@ export class ActorService {
    * @param {DShare.PagingSearchDto} searchDto
    * @returns {Promise<IShare.IResponseBase<IActor.IPagingQueryResponse<Actor[]> | string>>}
    */
-  public async getActors(searchDto: DShare.PagingSearchDto): Promise<IShare.IResponseBase<IActor.IPagingQueryResponse<Actor[]> | string>> {
+  public async getActors(searchDto: DShare.PagingSearchDto): Promise<IShare.IResponseBase<IActor.IPagingQueryResponse<Actor[]> | string> | HttpException> {
     if (!searchDto.take) searchDto.take = 10;
     if (!searchDto.skip) searchDto.skip = 0;
     if (!searchDto.keyword) searchDto.keyword = '';
@@ -36,7 +36,7 @@ export class ActorService {
 
       if (!actors || !count) {
         this.logger.error('No actor records has been found', '', 'GetActorsServiceError');
-        throw new HttpException(
+        return new HttpException(
           {
             status: HttpStatus.NOT_FOUND,
             error: 'No actor records has been found',
