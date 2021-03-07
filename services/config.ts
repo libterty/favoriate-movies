@@ -58,6 +58,7 @@ const configs = {
     // Server Setting
     HOST: process.env.APPHOST || 'localhost',
     PORT: process.env.APPPORT || 7080,
+    WSPORT: process.env.WSPORT || 81,
 
     JWT: {
       KEY: process.env.JWTKEY || 'lib',
