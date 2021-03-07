@@ -8,7 +8,6 @@ import * as DShare from '../shares/dtos';
 import * as IShare from '../shares/interfaces';
 import * as IMovie from './interfaces';
 import { isEmptyObj } from '../libs/utils';
-import { toUpper } from 'lodash';
 
 @EntityRepository(Movie)
 export class MovieRepository extends Repository<Movie> {
