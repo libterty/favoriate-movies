@@ -47,6 +47,7 @@
     "@nestjs/passport": "^7.1.5",
     "@nestjs/platform-express": "^7.0.0",
     "@nestjs/platform-fastify": "^7.5.1",
+    "@nestjs/serve-static": "^2.1.4",
     "@nestjs/swagger": "^4.6.1",
     "@nestjs/typeorm": "^7.1.4",
     "amqp-connection-manager": "^3.2.1",

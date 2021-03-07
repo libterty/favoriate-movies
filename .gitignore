@@ -43,3 +43,7 @@
 # env
 /*/*.env
 /*/*.dev.env
+
+
+# Image data
+*/public/assets

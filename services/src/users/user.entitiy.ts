@@ -1,4 +1,4 @@
-import { BaseEntity, Column, CreateDateColumn, UpdateDateColumn, Entity, Index, PrimaryGeneratedColumn, BeforeInsert, BeforeUpdate, ManyToMany, JoinColumn } from 'typeorm';
+import { BaseEntity, Column, CreateDateColumn, UpdateDateColumn, Entity, Index, PrimaryGeneratedColumn, BeforeInsert, BeforeUpdate, ManyToMany, JoinTable } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { Movie } from '../movies/movie.entity';
 import * as EUser from '../shares/enums';
@@ -46,14 +46,12 @@ export class User extends BaseEntity {
     () => Movie,
     (movie) => movie.rateUsers,
   )
-  @JoinColumn()
   rateMovies: Movie[];
 
   @ManyToMany(
     () => Movie,
     (movie) => movie.contributors,
   )
-  @JoinColumn()
   contributings: Movie[];
 
   /**

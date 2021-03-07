@@ -1,4 +1,5 @@
 import { Logger } from '@nestjs/common';
+import * as Express from 'express';
 
 /**
  * @description Check Memory Info
@@ -53,4 +54,30 @@ export function isEmptyObj(obj: { [key: string]: any }): boolean {
     if (Object.prototype.hasOwnProperty.call(obj, property)) return false;
   }
   return true;
+}
+
+/**
+ * @description Check if file is Image
+ * @public
+ * @param {Express.Request} req
+ * @param {IMovie.BufferedFile} file
+ * @param cb
+ */
+export function isImageFilter(
+  req: Express.Request,
+  file: {
+    fieldname: string;
+    originalname: string;
+    encoding: string;
+    mimetype: string;
+    size: number;
+    destination: string;
+    filename: string;
+    path: string;
+    buffer: Buffer;
+  },
+  cb: (error: Error | null, acceptFile: boolean) => void,
+) {
+  if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) return cb(new Error('Not Allowed File'), false);
+  return cb(null, true);
 }
