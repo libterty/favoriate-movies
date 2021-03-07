@@ -1,10 +1,10 @@
-import { Controller, Post, UseInterceptors, UploadedFile, Body, ValidationPipe, SetMetadata, UseGuards, Get, Param, HttpException, Query, Put } from '@nestjs/common';
+import { Controller, Post, UseInterceptors, UploadedFile, Body, ValidationPipe, SetMetadata, UseGuards, Get, Param, HttpException, Query, Put, Delete } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express';
 import RoleGuard from '../guards/local-guard';
 import { CurrentUser } from '../users/get-user.decorator';
 import { MovieService } from './movie.service';
-import { CreateMovieDto, GetMovieByIdDto, UpdateMovieByIdDto } from './dtos';
+import { CreateMovieDto, GetMovieByIdDto, UpdateMovieByIdDto, RemoveMovieByIdDto } from './dtos';
 import { isImageFilter } from '../libs/utils';
 import { Movie } from './movie.entity';
 import * as DShare from '../shares/dtos';
@@ -64,7 +64,7 @@ export class MovieController {
   }
 
   /**
-   * @description Update existed movie id
+   * @description Update existed movie by id
    * @Put
    * @param {IUser.IUserInfo | IUser.JwtPayload} user
    * @param {GetMovieByIdDto} getMovieByIdDto
@@ -76,5 +76,19 @@ export class MovieController {
   @UseGuards(AuthGuard(['jwt']), RoleGuard)
   updateMovie(@CurrentUser() user: IUser.IUserInfo | IUser.JwtPayload, @Param(ValidationPipe) getMovieByIdDto: GetMovieByIdDto, @Body(ValidationPipe) updateMovieByIdDto: UpdateMovieByIdDto): Promise<IShare.IResponseBase<Movie | string> | HttpException> {
     return this.movieService.updateMovie(user, getMovieByIdDto, updateMovieByIdDto);
+  }
+
+  /**
+   * @Routes Soft delete movie by id
+   * @Delete
+   * @param {IUser.IUserInfo | IUser.JwtPayload} user
+   * @param {RemoveMovieByIdDto} removeMovieByIdDto
+   * @returns {Promise<IShare.IResponseBase<unknown | string> | HttpException>}
+   */
+  @Delete('/:id')
+  @SetMetadata('roles', [EShare.EUserRole.USER, EShare.EUserRole.ADMIN])
+  @UseGuards(AuthGuard(['jwt']), RoleGuard)
+  removeMovie(@CurrentUser() user: IUser.IUserInfo | IUser.JwtPayload, @Param(ValidationPipe) removeMovieByIdDto: RemoveMovieByIdDto): Promise<IShare.IResponseBase<unknown | string> | HttpException> {
+    return this.movieService.removeMovie(user, removeMovieByIdDto);
   }
 }

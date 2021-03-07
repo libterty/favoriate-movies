@@ -57,3 +57,5 @@ export class UpdateMovieByIdDto {
   @IsArray()
   actors?: string[];
 }
+
+export class RemoveMovieByIdDto extends GetMovieBaseDto {}

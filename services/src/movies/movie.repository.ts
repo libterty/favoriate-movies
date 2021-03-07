@@ -3,11 +3,12 @@ import { EntityManager, EntityRepository, getManager, Like, Repository } from 't
 import { User } from '../users/user.entitiy';
 import { Movie } from './movie.entity';
 import { Actor } from '../actors/actor.entity';
-import { CreateMovieDto, GetMovieByIdDto, UpdateMovieByIdDto } from './dtos';
+import { CreateMovieDto, GetMovieByIdDto, UpdateMovieByIdDto, RemoveMovieByIdDto } from './dtos';
 import * as DShare from '../shares/dtos';
 import * as IShare from '../shares/interfaces';
 import * as IMovie from './interfaces';
 import { isEmptyObj } from '../libs/utils';
+import { toUpper } from 'lodash';
 
 @EntityRepository(Movie)
 export class MovieRepository extends Repository<Movie> {
@@ -128,6 +129,14 @@ export class MovieRepository extends Repository<Movie> {
     }
   }
 
+  /**
+   * @description Handle rate updates when new contributors submit rate
+   * @private
+   * @param {User} user
+   * @param {Movie} movie
+   * @param {number} newRatings
+   * @returns {Movie}
+   */
   private handleRateUpdates(user: User, movie: Movie, newRatings: number): Movie {
     let isExistedRaters = false;
     movie.rateUsers.forEach((rateUser) => {
@@ -174,7 +183,24 @@ export class MovieRepository extends Repository<Movie> {
         throw new InternalServerErrorException(error.message);
       }
     }
-
     return movie;
+  }
+
+  /**
+   * @description Soft remove movie by id
+   * @public
+   * @param {RemoveMovieByIdDto} removeMovieByIdDto
+   * @returns {Promise<boolean>}
+   */
+  public async removeMovie(removeMovieByIdDto: RemoveMovieByIdDto): Promise<boolean> {
+    try {
+      const movie = await this.getMovieById(removeMovieByIdDto);
+      const delResult = await movie.softRemove();
+      if (!delResult) return false;
+      return true;
+    } catch (error) {
+      this.logger.error(error.message, '', 'RemoveMovieRepoError');
+      throw new InternalServerErrorException(error.message);
+    }
   }
 }

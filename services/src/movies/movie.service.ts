@@ -1,11 +1,11 @@
-import { HttpException, HttpStatus, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Movie } from './movie.entity';
 import { UserRepository } from '../users/user.repository';
 import { MovieRepository } from './movie.repository';
 import { ActorRepository } from '../actors/actor.repository';
 import { UploaderService } from '../uploaders/uploader.service';
-import { CreateMovieDto, GetMovieByIdDto, UpdateMovieByIdDto } from './dtos';
+import { CreateMovieDto, GetMovieByIdDto, UpdateMovieByIdDto, RemoveMovieByIdDto } from './dtos';
 import HTTPResponse from '../libs/response';
 import * as DShare from '../shares/dtos';
 import * as EShare from '../shares/enums';
@@ -194,6 +194,51 @@ export class MovieService {
       return this.httpResponse.StatusOK(updateMovie);
     } catch (error) {
       this.logger.error(error.message, '', 'UpdateMovieServiceError');
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: error.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  /**
+   * @description Soft remove movie by id
+   * @public
+   * @param {IUser.IUserInfo | IUser.JwtPayload} user
+   * @param {RemoveMovieByIdDto} removeMovieByIdDto
+   * @returns {Promise<IShare.IResponseBase<unknown | string> | HttpException>}
+   */
+  public async removeMovie(user: IUser.IUserInfo | IUser.JwtPayload, removeMovieByIdDto: RemoveMovieByIdDto): Promise<IShare.IResponseBase<unknown | string> | HttpException> {
+    try {
+      // check if user is existed
+      const isAdmin: boolean = user.role === EShare.EUserRole.ADMIN;
+      const findUser = await this.userRepository.getUserById(user.id, isAdmin);
+      if (!findUser) {
+        return new HttpException(
+          {
+            status: HttpStatus.FORBIDDEN,
+            error: 'Invalid user',
+          },
+          HttpStatus.FORBIDDEN,
+        );
+      }
+      const delResult = await this.movieRepository.removeMovie(removeMovieByIdDto);
+      if (!delResult) {
+        this.logger.error(`Movie ${removeMovieByIdDto.id} delete conflict`, '', 'RemoveMovieServiceError');
+        return new HttpException(
+          {
+            status: HttpStatus.CONFLICT,
+            error: `Movie ${removeMovieByIdDto.id} delete conflict`,
+          },
+          HttpStatus.CONFLICT,
+        );
+      }
+      return this.httpResponse.StatusNoContent();
+    } catch (error) {
+      this.logger.error(error.message, '', 'RemoveMovieServiceError');
       throw new HttpException(
         {
           status: HttpStatus.INTERNAL_SERVER_ERROR,
