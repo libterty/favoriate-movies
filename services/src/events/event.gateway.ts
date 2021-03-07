@@ -7,8 +7,11 @@ import { config } from '../../config';
 @Injectable()
 export class EventGateway {
   private wss: WebSocket.Server;
+
   private client: WebSocket;
+
   private readonly logger: Logger = new Logger('EventGateway');
+
   private readonly movieAggregate: MovieAggregate = new MovieAggregate();
 
   constructor() {
@@ -23,11 +26,9 @@ export class EventGateway {
   private init(): void {
     this.wss = new WebSocket.Server({ port: config.WSPORT });
     this.wss.on('connection', (ws: WebSocket) => {
-      //connection is up, let's add a simple simple event
+      // connection is up, let's add a simple simple event
       ws.on('message', (message: string) => {
-        //log the received message and send it back to the client
-        console.log('received: %s', message);
-        ws.send(`Hello, you sent -> ${message}`);
+        this.logger.log('Messsage is On');
       });
       this.logger.log('Connection WS Success');
     });
@@ -43,7 +44,7 @@ export class EventGateway {
     this.wss.clients.forEach((client: WebSocket) => {
       client.send(JSON.stringify(this.movieAggregate.getCreateMovieAggregate(movie)), (err) => {
         if (err) {
-          this.logger.error(err.message, '', 'SendUpdateMovieError');
+          this.logger.error(err.message, '', 'SendNewMovieError');
         }
       });
     });
@@ -75,7 +76,7 @@ export class EventGateway {
     this.wss.clients.forEach((client: WebSocket) => {
       client.send(JSON.stringify(this.movieAggregate.getDeleteMovieAggregate(id)), (err) => {
         if (err) {
-          this.logger.error(err.message, '', 'SendUpdateMovieError');
+          this.logger.error(err.message, '', 'SendDeleteMovieError');
         }
       });
     });
