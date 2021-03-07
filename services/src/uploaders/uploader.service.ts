@@ -18,6 +18,8 @@ export class UploaderService {
         if (!stats) {
           fs.mkdirSync(join(process.cwd(), 'public'));
           fs.mkdirSync(join(process.cwd(), 'public/assets'));
+          // create a empty html file to avoid nestjs server static throw error
+          fs.writeFileSync(join(process.cwd(), 'public/assets/index.html'), '', 'utf8');
           return resolve(true);
         }
         return resolve(true);
