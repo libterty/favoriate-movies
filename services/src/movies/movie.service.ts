@@ -5,6 +5,7 @@ import { UserRepository } from '../users/user.repository';
 import { MovieRepository } from './movie.repository';
 import { ActorRepository } from '../actors/actor.repository';
 import { UploaderService } from '../uploaders/uploader.service';
+import { EventGateway } from '../events/event.gateway';
 import { CreateMovieDto, GetMovieByIdDto, UpdateMovieByIdDto, RemoveMovieByIdDto } from './dtos';
 import HTTPResponse from '../libs/response';
 import * as DShare from '../shares/dtos';
@@ -27,6 +28,7 @@ export class MovieService {
     @InjectRepository(ActorRepository)
     private readonly actorRepository: ActorRepository,
     private readonly uploaderService: UploaderService,
+    private readonly eventGateway: EventGateway,
   ) {}
 
   /**
@@ -67,6 +69,7 @@ export class MovieService {
           HttpStatus.CONFLICT,
         );
       }
+      this.eventGateway.sendNewMovie(movie);
       return this.httpResponse.StatusCreated(movie);
     } catch (error) {
       this.logger.error(error.message, '', 'CreateMovieServiceError');
@@ -191,6 +194,7 @@ export class MovieService {
           HttpStatus.CONFLICT,
         );
       }
+      this.eventGateway.sendUpdateMovie(updateMovie);
       return this.httpResponse.StatusOK(updateMovie);
     } catch (error) {
       this.logger.error(error.message, '', 'UpdateMovieServiceError');
@@ -236,6 +240,7 @@ export class MovieService {
           HttpStatus.CONFLICT,
         );
       }
+      this.eventGateway.sendDeleteMovie(removeMovieByIdDto.id);
       return this.httpResponse.StatusNoContent();
     } catch (error) {
       this.logger.error(error.message, '', 'RemoveMovieServiceError');

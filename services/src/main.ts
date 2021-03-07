@@ -20,7 +20,6 @@ async function bootstrap() {
     origin: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
   });
-
   await app.listen(config.PORT);
   Logger.log(`Server start on ${config.HOST}:${config.PORT}`, 'Bootstrap', true);
 }
