@@ -1,4 +1,4 @@
-import { Entity, BaseEntity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, BeforeInsert, BeforeUpdate, ManyToOne, ManyToMany, JoinColumn } from 'typeorm';
+import { Entity, BaseEntity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, BeforeInsert, BeforeUpdate, ManyToMany, JoinTable } from 'typeorm';
 import { Movie } from '../movies/movie.entity';
 
 @Entity()
@@ -18,10 +18,8 @@ export class Actor extends BaseEntity {
   @ManyToMany(
     () => Movie,
     (movie) => movie.actors,
-    { nullable: true },
   )
-  @JoinColumn()
-  movies?: Movie[];
+  movies: Movie[];
 
   @BeforeInsert()
   updateWhenInsert() {

@@ -1,5 +1,5 @@
 import { InternalServerErrorException, Logger } from '@nestjs/common';
-import { EntityManager, EntityRepository, getManager, Like, Repository } from 'typeorm';
+import { EntityManager, EntityRepository, getManager, In, Like, Repository } from 'typeorm';
 import { Actor } from './actor.entity';
 import * as DShare from '../shares/dtos';
 import * as IShare from '../shares/interfaces';
@@ -42,6 +42,25 @@ export class ActorRepository extends Repository<Actor> {
       };
     } catch (error) {
       this.logger.error(error.message, '', 'GetActorsRepoError');
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  /**
+   * @description Get related actors by name search
+   * @public
+   * @param {string[]} actorNames
+   * @returns {Promise<Actor[]>}
+   */
+  public async getRelationActors(actorNames: string[]): Promise<Actor[]> {
+    try {
+      return await this.repoManager.find(Actor, {
+        where: {
+          name: In(actorNames),
+        },
+      });
+    } catch (error) {
+      this.logger.error(error.message, '', 'GetRelationActorsRepoError');
       throw new InternalServerErrorException(error.message);
     }
   }

@@ -12,6 +12,10 @@ export const CurrentUser = createParamDecorator(
    */
   (data: unknown, ctx: ExecutionContext): unknown | IUser.IUserInfo => {
     const { user } = ctx.switchToHttp().getRequest<Request>();
+    // eslint-disable-next-line
+    delete user['password'];
+    // eslint-disable-next-line
+    delete user['salt'];
     return user;
   },
 );

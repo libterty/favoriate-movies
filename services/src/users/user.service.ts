@@ -1,5 +1,5 @@
 import Redis from 'ioredis';
-import { Injectable, Logger } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { User } from './user.entitiy';
@@ -36,18 +36,33 @@ export class UserService {
    * @description Sign up user service action
    * @public
    * @param {UserCreditDto} userCreditDto
-   * @returns {Promise<IShare.IResponseBase<User | string>>}
+   * @returns {Promise<IShare.IResponseBase<User | string> | HttpException>}
    */
-  public async signUp(userCreditDto: UserCreditDto): Promise<IShare.IResponseBase<User | string>> {
+  public async signUp(userCreditDto: UserCreditDto): Promise<IShare.IResponseBase<User | string> | HttpException> {
     try {
       const user = await this.userRepository.signUp(userCreditDto);
-      if (!user) return this.httpResponse.InternalServerError(`User ${userCreditDto.username} create fail`);
+      if (!user) {
+        this.logger.error(`User ${userCreditDto.username} create fail`, '', 'SignUpServiceError');
+        return new HttpException(
+          {
+            status: HttpStatus.CONFLICT,
+            error: `User ${userCreditDto.username} create fail`,
+          },
+          HttpStatus.CONFLICT,
+        );
+      }
       delete user.password;
       delete user.salt;
       return this.httpResponse.StatusCreated(user);
     } catch (error) {
       this.logger.error(error.message, '', 'SignUpServiceError');
-      return this.httpResponse.InternalServerError(error.message);
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: error.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -55,12 +70,21 @@ export class UserService {
    * @description Sign in user service action
    * @public
    * @param {SigninCreditDto} signinCreditDto
-   * @returns {Promise<IShare.IResponseBase<string>>}
+   * @returns {Promise<IShare.IResponseBase<string> | HttpException>}
    */
-  public async signIn(signinCreditDto: SigninCreditDto): Promise<IShare.IResponseBase<string>> {
+  public async signIn(signinCreditDto: SigninCreditDto): Promise<IShare.IResponseBase<string> | HttpException> {
     try {
       const user = await this.userRepository.signIn(signinCreditDto);
-      if (!user) return this.httpResponse.UnAuthorizedError('Invalid request');
+      if (!user) {
+        this.logger.error('Invalid request', '', 'SignInServiceError');
+        return new HttpException(
+          {
+            status: HttpStatus.UNAUTHORIZED,
+            error: 'Invalid request',
+          },
+          HttpStatus.UNAUTHORIZED,
+        );
+      }
       const payload: IUser.JwtPayload = {
         id: user.id,
         username: user.username,
@@ -71,7 +95,13 @@ export class UserService {
       return this.httpResponse.StatusOK(accessToken);
     } catch (error) {
       this.logger.error(error.message, '', 'SignInServiceError');
-      return this.httpResponse.InternalServerError(error.message);
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: error.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -79,10 +109,19 @@ export class UserService {
    * @description Get user information
    * @public
    * @param {IUser.IUserInfo} user
-   * @returns {IShare.IResponseBase<{ user: IUser.IUserInfo } | string>}
+   * @returns {IShare.IResponseBase<{ user: IUser.IUserInfo } | string > | HttpException}
    */
-  public getUser(user: IUser.IUserInfo): IShare.IResponseBase<{ user: IUser.IUserInfo } | string> {
-    if (!user) return this.httpResponse.UnAuthorizedError('No user existed');
+  public getUser(user: IUser.IUserInfo): IShare.IResponseBase<{ user: IUser.IUserInfo } | string> | HttpException {
+    if (!user) {
+      this.logger.error('No user existed', '', 'GetUserServiceError');
+      return new HttpException(
+        {
+          status: HttpStatus.UNAUTHORIZED,
+          error: 'No user existed',
+        },
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
     return this.httpResponse.StatusOK({
       user: {
         id: user.id,
@@ -99,17 +138,32 @@ export class UserService {
    * @public
    * @param {string} id
    * @param {IUser.IUserInfo} user
-   * @returns {Promise<User>}
+   * @returns {Promise<IShare.IResponseBase<User | string> | HttpException>}
    */
-  public async getUserById(id: string, payload: IUser.IUserInfo): Promise<IShare.IResponseBase<User | string>> {
+  public async getUserById(id: string, payload: IUser.IUserInfo): Promise<IShare.IResponseBase<User | string> | HttpException> {
     const isAdmin: boolean = payload.role === EUser.EUserRole.ADMIN;
     try {
       const user = await this.userRepository.getUserById(id, isAdmin);
-      if (!user) return this.httpResponse.NotFoundError(`Cannot find user ${id}`);
+      if (!user) {
+        this.logger.error(`Cannot find user ${id}`, '', 'GetUserByIdServiceError');
+        return new HttpException(
+          {
+            status: HttpStatus.NOT_FOUND,
+            error: `Cannot find user ${id}`,
+          },
+          HttpStatus.NOT_FOUND,
+        );
+      }
       return this.httpResponse.StatusOK(user);
     } catch (error) {
       this.logger.error(error.message, '', 'GetUserByIdServiceError');
-      return this.httpResponse.InternalServerError(error.message);
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: error.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -125,7 +179,13 @@ export class UserService {
       return this.httpResponse.StatusOK('Logout success');
     } catch (error) {
       this.logger.error(error.message, '', 'LogOutServiceError');
-      return this.httpResponse.InternalServerError(error.message);
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: error.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 }

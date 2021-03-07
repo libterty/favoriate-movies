@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Actor } from './actor.entity';
 import { ActorRepository } from './actor.repository';
@@ -25,7 +25,7 @@ export class ActorService {
    * @param {DShare.PagingSearchDto} searchDto
    * @returns {Promise<IShare.IResponseBase<IActor.IPagingQueryResponse<Actor[]> | string>>}
    */
-  public async getActors(searchDto: DShare.PagingSearchDto): Promise<IShare.IResponseBase<IActor.IPagingQueryResponse<Actor[]> | string>> {
+  public async getActors(searchDto: DShare.PagingSearchDto): Promise<IShare.IResponseBase<IActor.IPagingQueryResponse<Actor[]> | string> | HttpException> {
     if (!searchDto.take) searchDto.take = 10;
     if (!searchDto.skip) searchDto.skip = 0;
     if (!searchDto.keyword) searchDto.keyword = '';
@@ -34,7 +34,16 @@ export class ActorService {
     try {
       const { actors, take, skip, count } = await this.actorRepository.getActors(searchDto);
 
-      if (!actors || !count) return this.httpResponse.NotFoundError('No actor records has been found');
+      if (!actors || !count) {
+        this.logger.error('No actor records has been found', '', 'GetActorsServiceError');
+        return new HttpException(
+          {
+            status: HttpStatus.NOT_FOUND,
+            error: 'No actor records has been found',
+          },
+          HttpStatus.NOT_FOUND,
+        );
+      }
 
       return this.httpResponse.StatusOK({
         actors,
@@ -44,7 +53,13 @@ export class ActorService {
       });
     } catch (error) {
       this.logger.error(error.message, '', 'GetActorsServiceError');
-      return this.httpResponse.InternalServerError(error.message);
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: error.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 }

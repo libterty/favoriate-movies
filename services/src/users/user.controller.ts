@@ -1,4 +1,4 @@
-import { Controller, Get, Post, UsePipes, ValidationPipe, Body, UseGuards, Headers, Param, ParseUUIDPipe } from '@nestjs/common';
+import { Controller, Get, Post, UsePipes, ValidationPipe, Body, UseGuards, Headers, Param, ParseUUIDPipe, HttpException } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { User } from './user.entitiy';
 import { UserService } from './user.service';
@@ -20,11 +20,11 @@ export class UserController {
   /**
    * @Routes Get user informations from receiving payload
    * @param {IUser.IUserInfo} user
-   * @returns {IShare.IResponseBase<{ user: IUser.IUserInfo } | string>}
+   * @returns {IShare.IResponseBase<{ user: IUser.IUserInfo } | string> | HttpException}
    */
   @Get('/info')
   @UseGuards(AuthGuard(['jwt']))
-  getUser(@CurrentUser() user: IUser.IUserInfo): IShare.IResponseBase<{ user: IUser.IUserInfo } | string> {
+  getUser(@CurrentUser() user: IUser.IUserInfo): IShare.IResponseBase<{ user: IUser.IUserInfo } | string> | HttpException {
     return this.userService.getUser(user);
   }
 
@@ -43,31 +43,31 @@ export class UserController {
    * @Routes Get an user by id
    * @param {IUser.IUserInfo} user
    * @param {string} id
-   * @returns {Promise<IShare.IResponseBase<User | string>>}
+   * @returns {Promise<IShare.IResponseBase<User | string> | HttpException>}
    */
   @Get('/:id/info')
   @UseGuards(AuthGuard(['jwt']))
-  getUserById(@CurrentUser() user: IUser.IUserInfo, @Param('id', ParseUUIDPipe) id: string): Promise<IShare.IResponseBase<User | string>> {
+  getUserById(@CurrentUser() user: IUser.IUserInfo, @Param('id', ParseUUIDPipe) id: string): Promise<IShare.IResponseBase<User | string> | HttpException> {
     return this.userService.getUserById(id, user);
   }
 
   /**
    * @Routes SignUp routes
    * @param {UserCreditDto} userCreditDto
-   * @returns {Promise<IShare.IResponseBase<User | string>>}
+   * @returns {Promise<IShare.IResponseBase<User | string> | HttpException>}
    */
   @Post('/signup')
-  signUp(@Body(ValidationPipe) userCreditDto: UserCreditDto): Promise<IShare.IResponseBase<User | string>> {
+  signUp(@Body(ValidationPipe) userCreditDto: UserCreditDto): Promise<IShare.IResponseBase<User | string> | HttpException> {
     return this.userService.signUp(userCreditDto);
   }
 
   /**
    * @Routes SignIn routes
    * @param {SigninCreditDto} signinCreditDto
-   * @returns {Promise<IShare.IResponseBase<string>>}
+   * @returns {Promise<IShare.IResponseBase<string> | HttpException>}
    */
   @Post('/signin')
-  signIn(@Body(ValidationPipe) signinCreditDto: SigninCreditDto): Promise<IShare.IResponseBase<string>> {
+  signIn(@Body(ValidationPipe) signinCreditDto: SigninCreditDto): Promise<IShare.IResponseBase<string> | HttpException> {
     return this.userService.signIn(signinCreditDto);
   }
 }
