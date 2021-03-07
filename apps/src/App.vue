@@ -1,8 +1,24 @@
 <template>
   <div id="app">
+    <Navbar />
     <router-view/>
+    <Footer />
   </div>
 </template>
+
+<script lang="ts">
+import { Component, Vue } from 'vue-property-decorator';
+import Navbar from './components/Navbar.vue';
+import Footer from './components/Footer.vue';
+
+@Component({
+  components: {
+    Navbar,
+    Footer,
+  },
+})
+export default class App extends Vue {}
+</script>
 
 <style>
 #app {
@@ -12,6 +28,7 @@
   text-align: center;
   color: #2c3e50;
   background: white !important;
+  height: 100vh;
 }
 #nav {
   padding: 30px;

@@ -34,3 +34,9 @@ export default class Movies extends Vue {
   }
 }
 </script>
+
+<style scoped>
+.Movies {
+  height: calc(100% - 50px);
+}
+</style>
