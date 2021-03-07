@@ -16,14 +16,11 @@ const routes: Array<RouteConfig> = [
     path: '/movies',
     name: 'Movies',
     component: Movies,
-    children: [
-      {
-        path: '/movies/:id',
-        name: 'MovieInfo',
-        component: MovieDetail,
-        props: true,
-      },
-    ],
+  },
+  {
+    path: '/movies/:id',
+    name: 'MovieInfo',
+    component: MovieDetail,
   },
 ];
 
