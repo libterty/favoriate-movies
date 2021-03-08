@@ -19,6 +19,11 @@
                   <b-list-group-item v-for="(actor, index) in actors" :key='index'>{{actor.name}}</b-list-group-item>
                 </b-list-group>
               </b-col>
+
+              <b-button-group>
+                <b-button :href="editPath" variant="primary">Update Movie!</b-button>
+                <b-button @click.prevent="deleteMovie" variant="danger">Delete Movie!</b-button>
+              </b-button-group>
             </b-card-body>
           </b-col>
         </b-row>
@@ -29,14 +34,25 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
+import { namespace } from 'vuex-class';
 import MoivessApi from '../movies/request';
+import ComponentHelper from '../utils/component.helper';
+import LocalStorageHelper from '../localstorages/localstorage.provider';
+import * as IShare from '../shares/interfaces';
 import * as IMovie from '../movies/interfaces';
+
+const profile = namespace('Profile');
 
 @Component({})
 export default class MovieDetail extends Vue {
   public movie: IMovie.IMovieTable;
   public serveStaticUrl = 'http://localhost:7080/';
   public actors: IMovie.IActor[] = [];
+  public editPath = `${document.location.pathname}/edit`;
+
+  // Vuex Area
+  @profile.State
+  public user!: IShare.IUserInfo;
 
   /**
    * @LifeCycle
@@ -55,18 +71,64 @@ export default class MovieDetail extends Vue {
     try {
       const id = document.location.pathname.replace(/\/movies\//gi, '');
       const result = await MoivessApi.getMovieById(id);
-      if (typeof result === 'undefined') throw new Error('Something went wrong');
-      if (result.status === 'success') {
-        this.movie = result.message;
-        if (result.message.image) {
-          this.serveStaticUrl += result.message.image;
-        }
-        if (result.message.actors.length > 0) {
-          this.actors = result.message.actors.map((actor) => ({ id: actor.id, name: actor.name }));
-        }
+      if (typeof result === 'undefined') {
+        ComponentHelper.alertMsg('GetMovie', 'Something went wrong', 'error');
+        return;
+      }
+      if (result.status !== 'success') {
+        ComponentHelper.alertMsg('GetMovie', `Get movie ${id} failed`, 'error');
+        return;
+      }
+      this.movie = result.message;
+      if (result.message.image) {
+        this.serveStaticUrl += result.message.image;
+      }
+      if (result.message.actors.length > 0) {
+        this.actors = result.message.actors.map((actor) => ({ id: actor.id, name: actor.name }));
       }
     } catch (error) {
-      throw new Error(error.message);
+      ComponentHelper.alertMsg('GetMovie', 'Something went wrong', 'error');
+    }
+  }
+
+  /**
+   * @description Get auth token
+   * @private
+   * @returns {string}
+   */
+  private getTokens(): string {
+    if (!this.user) return null;
+    if (!this.user.id) return null;
+    const localStr = LocalStorageHelper.getWithExpiry(this.user.id);
+    if (typeof localStr !== 'string') return null;
+    return localStr;
+  }
+
+  public async deleteMovie() {
+    try {
+      const token = this.getTokens();
+      if (!token) {
+        return ComponentHelper.alertMsg('Validate', 'Invalid request', 'error');
+      }
+      const id = document.location.pathname.replace(/\/movies\//gi, '');
+      const result = await MoivessApi.deleteMovie(id, token);
+      if (typeof result === 'undefined') throw new Error('Something went wrong');
+      if (result.status !== 'success') {
+        return ComponentHelper.alertMsg('DeleteMovie', 'Delete movie failed', 'error');
+      }
+      return ComponentHelper
+        .alertMsgWithoutIcon('DeleteMovie', 'Delete movie success')
+        .then(() => {
+          this.$router.push({ name: 'Movies' });
+        })
+        .catch((err) => {
+          throw new Error(err.message);
+        })
+        .finally(() => {
+          this.$router.push({ name: 'Movies' });
+        });
+    } catch (error) {
+      return ComponentHelper.alertMsg('DeleteMovie', 'Something went wrong', 'error');
     }
   }
 }

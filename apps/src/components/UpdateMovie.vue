@@ -140,14 +140,16 @@ export default class UpdateMovie extends Vue {
         sort: 'DESC',
       }, token);
       if (typeof result === 'undefined') {
-        ComponentHelper.alertMsg('Validate', 'Caught promise rejection', 'error');
+        ComponentHelper.alertMsg('GetAllActors', 'Caught promise rejection', 'error');
         return;
       }
-      if (result.status === 'success') {
-        result.message.actors.forEach((actor) => {
-          this.actorsOptions.push({ value: actor.name, text: actor.name });
-        });
+      if (result.status !== 'success') {
+        ComponentHelper.alertMsg('GetAllActors', 'Get all actors fail', 'error');
+        return;
       }
+      result.message.actors.forEach((actor) => {
+        this.actorsOptions.push({ value: actor.name, text: actor.name });
+      });
     } catch (error) {
       ComponentHelper.alertMsg('Validate', 'Caught promise rejection', 'error');
     }
