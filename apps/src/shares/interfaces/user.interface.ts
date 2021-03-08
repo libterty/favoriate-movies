@@ -42,3 +42,8 @@ export interface IProfileState {
   user?: IUserInfo;
   error: boolean;
 }
+
+export interface IGetUserInfoAPIResponse {
+  token: string;
+  user: IUserInfo;
+}

@@ -1,6 +1,6 @@
 <template>
   <div class="Login">
-    <b-form class="Login-Form" @submit="onSubmit" @reset="onReset" v-if="show">
+    <b-form class="Login-Form" @submit="onSubmit" v-if="show">
       <b-form-group
         id="input-group-1"
         label="Username"
@@ -27,7 +27,6 @@
       </b-form-group>
 
       <b-button type="submit" variant="primary">Submit</b-button>
-      <b-button type="reset" variant="danger">Reset</b-button>
     </b-form>
   </div>
 </template>
@@ -38,6 +37,7 @@ import { validateOrReject } from 'class-validator';
 import { namespace } from 'vuex-class';
 import UsersApi from '../users/request';
 import ComponentHelper from '../utils/component.helper';
+import LocalStorageHelper from '../localstorages/localstorage.provider';
 import { SigninCreditDto } from '../users/dtos';
 import * as IShare from '../shares/interfaces';
 
@@ -88,38 +88,37 @@ export default class Login extends Vue {
       if (result.status !== 'success') {
         return ComponentHelper.alertMsg('Login', result.message, 'error');
       }
-      await this.getUserInfo(result.message);
+      const userResult = await this.getUserInfo(result.message);
+      if (!userResult) return ComponentHelper.alertMsg('Login', 'Invalid Credits', 'error');
+      LocalStorageHelper.setWithExpiry(userResult.user.id, { token: userResult.token }, 3600);
+      this.onReset();
       return ComponentHelper.alertMsg('Login', 'Login success', 'success');
     } catch (error) {
       return ComponentHelper.alertMsg('Login', 'Something went wrong', 'error');
     }
   }
 
-  async getUserInfo(token: string) {
+  async getUserInfo(token: string): Promise<IShare.IGetUserInfoAPIResponse> {
     try {
       const result = await UsersApi.getUserInfo(token);
       if (typeof result === 'undefined') {
-        return ComponentHelper.alertMsg('Login', 'Something went wrong', 'error');
+        ComponentHelper.alertMsg('Login', 'Something went wrong', 'error');
+        return null;
       }
-      console.log('reuslt: ', result);
       this.setUser(result.message.user);
-      console.log('user: ', this.user);
-      return result.message;
+      return {
+        token,
+        user: result.message.user,
+      };
     } catch (error) {
-      return ComponentHelper.alertMsg('Login', 'Something went wrong', 'error');
+      ComponentHelper.alertMsg('Login', 'Something went wrong', 'error');
+      return null;
     }
   }
 
-  onReset(event) {
-    event.preventDefault();
-    // Reset our form values
+  onReset() {
     this.form.username = '';
     this.form.password = '';
-    // Trick to reset/clear native browser form validation state
-    this.show = false;
-    this.$nextTick(() => {
-      this.show = true;
-    });
   }
 }
 </script>
