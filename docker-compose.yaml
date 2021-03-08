@@ -42,6 +42,7 @@ services:
       REDIS_URL: tcp://cachedb:6379
     ports:
       - 7080:7080
+      - 81:81
   app:
     build: ./apps
     container_name: movies-app
@@ -49,6 +50,8 @@ services:
       - server
     links:
       - server
+    ports:
+      - 8080:80
 
 volumes:
   movie_data:
