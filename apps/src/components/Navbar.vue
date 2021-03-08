@@ -50,7 +50,9 @@ export default class Navbar extends Vue {
    * @Mounted
    */
   mounted() {
-    this.checkStatus();
+    this.$store.subscribe((mutation, state) => {
+      this.checkStatus(state);
+    });
   }
 
   /**
@@ -58,16 +60,16 @@ export default class Navbar extends Vue {
    * @private
    * @returns {void}
    */
-  private checkStatus(): void {
-    if (!this.user) {
+  private checkStatus(state): void {
+    if (!state.Profile.user) {
       this.isLogin = false;
       return;
     }
-    if (!this.user.id) {
+    if (!state.Profile.user.id) {
       this.isLogin = false;
       return;
     }
-    const localStr = LocalStorageHelper.getWithExpiry(this.user.id);
+    const localStr = LocalStorageHelper.getWithExpiry(state.Profile.user.id);
     if (!localStr) {
       this.isLogin = false;
     }
