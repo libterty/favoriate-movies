@@ -13,10 +13,10 @@
             <em v-if="isLogin">Welcome back {{user.username}}!!</em>
             <em v-if="!isLogin">Hi Anonymous please login!!</em>
           </template>
-          <b-dropdown-item v-if="!isLogin" href="/login">Sign In</b-dropdown-item>
-          <b-dropdown-item v-if="isLogin" href="#">
-            <b-button variant="primary" size="sm" @click="logOutUser">Sign Out</b-button>
-          </b-dropdown-item>
+          <b-dropdown-item id="dropdown-1" v-if="!isLogin" href="/login">Sign In</b-dropdown-item>
+          <b-dropdown-item id="dropdown-2" @click="logOutUser" v-if="isLogin" class="m-md-2">Sign Out</b-dropdown-item>
+          <b-dropdown-divider></b-dropdown-divider>
+          <b-dropdown-item id="dropdown-3" href="/movies/create">Create New Movie</b-dropdown-item>
         </b-nav-item-dropdown>
       </b-navbar-nav>
     </b-collapse>

@@ -130,7 +130,11 @@ export default class UpdateMovie extends Vue {
     try {
       const token = this.getTokens();
       if (!token) {
-        ComponentHelper.alertMsg('Validate', 'Invalid request', 'error');
+        ComponentHelper
+          .alertMsg('Validate', 'Invalid request', 'error')
+          .then(() => {
+            this.$router.push('/login');
+          });
         return;
       }
       const result = await ActorsApi.getAllAcotrs({
@@ -202,7 +206,11 @@ export default class UpdateMovie extends Vue {
     try {
       const token = this.getTokens();
       if (!token) {
-        return ComponentHelper.alertMsg('Validate', 'Invalid request', 'error');
+        return ComponentHelper
+          .alertMsg('Validate', 'Invalid request', 'error')
+          .then(() => {
+            this.$router.push('/login');
+          });
       }
       const id = document.location.pathname.replace(/\/movies\//gi, '').replace(/\/edit/gi, '');
       if (!id) {

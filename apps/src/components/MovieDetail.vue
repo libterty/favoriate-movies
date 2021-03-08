@@ -108,7 +108,11 @@ export default class MovieDetail extends Vue {
     try {
       const token = this.getTokens();
       if (!token) {
-        return ComponentHelper.alertMsg('Validate', 'Invalid request', 'error');
+        return ComponentHelper
+          .alertMsg('Validate', 'Invalid request', 'error')
+          .then(() => {
+            this.$router.push('/login');
+          });
       }
       const id = document.location.pathname.replace(/\/movies\//gi, '');
       const result = await MoivessApi.deleteMovie(id, token);
