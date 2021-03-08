@@ -1,6 +1,9 @@
 import * as EShare from '../enums';
 import * as IShare from './index';
 
+export interface IDeleteMovieEvent {
+  id: string;
+}
 export interface IMovie {
   id: string;
   name: string;
@@ -14,4 +17,9 @@ export interface IMovie {
   contributors: IShare.IUser[];
   createdAt: Date;
   updatedAt: Date;
+}
+
+export interface IMovieSocketEvent {
+  type: EShare.ESocketEvent;
+  data: IMovie | IDeleteMovieEvent;
 }

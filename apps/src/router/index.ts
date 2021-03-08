@@ -2,7 +2,11 @@ import Vue from 'vue';
 import VueRouter, { RouteConfig } from 'vue-router';
 import Home from '../views/Home.vue';
 import Movies from '../components/Movies.vue';
+import CreateMovie from '../components/CreateMovie.vue';
 import MovieDetail from '../components/MovieDetail.vue';
+import UpdateMovie from '../components/UpdateMovie.vue';
+import Login from '../components/Login.vue';
+import Signup from '../components/Signup.vue';
 
 Vue.use(VueRouter);
 
@@ -11,6 +15,7 @@ const routes: Array<RouteConfig> = [
     path: '/',
     name: 'Home',
     component: Home,
+    redirect: '/movies',
   },
   {
     path: '/movies',
@@ -18,9 +23,29 @@ const routes: Array<RouteConfig> = [
     component: Movies,
   },
   {
+    path: '/movies/create',
+    name: 'CreateMovie',
+    component: CreateMovie,
+  },
+  {
     path: '/movies/:id',
-    name: 'MovieInfo',
+    name: 'MovieDetail',
     component: MovieDetail,
+  },
+  {
+    path: '/movies/:id/edit',
+    name: 'UpdateMovie',
+    component: UpdateMovie,
+  },
+  {
+    path: '/login',
+    name: 'Login',
+    component: Login,
+  },
+  {
+    path: '/signup',
+    name: 'Signup',
+    component: Signup,
   },
 ];
 
