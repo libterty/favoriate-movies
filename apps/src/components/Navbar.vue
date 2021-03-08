@@ -10,9 +10,11 @@
         <b-nav-item-dropdown right>
           <!-- Using 'button-content' slot -->
           <template #button-content>
-            <em>User</em>
+            <em v-if="isLogin">Welcome back {{user.username}}!!</em>
+            <em v-if="!isLogin">Hi Anonymous please login!!</em>
           </template>
-          <b-dropdown-item href="#">Sign Out</b-dropdown-item>
+          <b-dropdown-item v-if="!isLogin" href="/login">Sign In</b-dropdown-item>
+          <b-dropdown-item v-if="isLogin" href="#">Sign Out</b-dropdown-item>
         </b-nav-item-dropdown>
       </b-navbar-nav>
     </b-collapse>
@@ -21,7 +23,27 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
+import { namespace } from 'vuex-class';
+import * as IShare from '../shares/interfaces';
 
-@Component({})
-export default class Navbar extends Vue {}
+const profile = namespace('Profile');
+
+@Component
+export default class Navbar extends Vue {
+  // state area
+  public isLogin: boolean = false;
+
+  // Vuex Area
+  @profile.State
+  public user!: IShare.IUserInfo;
+
+  mounted() {
+    console.log('this.user: ', this.user);
+    if (this.user && this.user.username) {
+      this.isLogin = true;
+    } else {
+      this.isLogin = false;
+    }
+  }
+}
 </script>
