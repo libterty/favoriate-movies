@@ -2,6 +2,7 @@ import Vue from 'vue';
 import VueRouter, { RouteConfig } from 'vue-router';
 import Home from '../views/Home.vue';
 import Movies from '../components/Movies.vue';
+import CreateMovie from '../components/CreateMovie.vue';
 import MovieDetail from '../components/MovieDetail.vue';
 import Login from '../components/Login.vue';
 import Signup from '../components/Signup.vue';
@@ -18,6 +19,11 @@ const routes: Array<RouteConfig> = [
     path: '/movies',
     name: 'Movies',
     component: Movies,
+  },
+  {
+    path: '/movies/create',
+    name: 'CreateMovie',
+    component: CreateMovie,
   },
   {
     path: '/movies/:id',

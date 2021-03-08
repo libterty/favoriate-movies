@@ -25,5 +25,7 @@ module.exports = {
     'no-plusplus': 'off',
     'default-case': 'off',
     'no-param-reassign': 'off',
+    'dot-notation': 'off',
+    'import/prefer-default-export': 'off',
   },
 };

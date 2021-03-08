@@ -20,5 +20,6 @@ interface IPage {
 export interface IMovieSearch<T> extends IPage {
   keyword?: string;
   sort?: TSort;
-  movies: T;
+  movies?: T;
+  actors?: T;
 }
