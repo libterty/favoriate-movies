@@ -170,7 +170,11 @@ export class MovieRepository extends Repository<Movie> {
     if (director) movie.director = director;
     if (genre) movie.genre = genre;
     if (actors) movie.actors = newActors;
-    if (user && !isEmptyObj(updateMovieByIdDto)) movie.contributors.push(user);
+    if (user && !isEmptyObj(updateMovieByIdDto)) {
+      console.log('Create Log');
+
+      movie.contributors.push(user);
+    }
 
     try {
       await movie.save();
