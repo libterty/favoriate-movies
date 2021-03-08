@@ -51,7 +51,7 @@ export class UpdateMovieByIdDto {
 
   @IsOptional()
   @IsEnum(EMovie.EMovieTypes)
-  genre: EMovie.EMovieTypes;
+  genre?: EMovie.EMovieTypes;
 
   @IsOptional()
   @IsArray()
