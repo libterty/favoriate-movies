@@ -35,10 +35,13 @@
 <script lang='ts'>
 import { Component, Vue } from 'vue-property-decorator';
 import { validateOrReject } from 'class-validator';
+import { namespace } from 'vuex-class';
 import UsersApi from '../users/request';
 import ComponentHelper from '../utils/component.helper';
 import { SigninCreditDto } from '../users/dtos';
 import * as IShare from '../shares/interfaces';
+
+const profile = namespace('Profile');
 
 @Component
 export default class Login extends Vue {
@@ -47,7 +50,12 @@ export default class Login extends Vue {
     password: '',
   };
   show = true;
+
   // Vuex Area
+  @profile.State
+  public user!: IShare.IUserInfo;
+  @profile.Mutation
+  public setUser!: (userData: IShare.IUserInfo) => void;
 
   async onSubmit(event) {
     event.preventDefault();
@@ -94,6 +102,8 @@ export default class Login extends Vue {
         return ComponentHelper.alertMsg('Login', 'Something went wrong', 'error');
       }
       console.log('reuslt: ', result);
+      this.setUser(result.message.user);
+      console.log('user: ', this.user);
       return result.message;
     } catch (error) {
       return ComponentHelper.alertMsg('Login', 'Something went wrong', 'error');
