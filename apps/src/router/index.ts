@@ -3,6 +3,8 @@ import VueRouter, { RouteConfig } from 'vue-router';
 import Home from '../views/Home.vue';
 import Movies from '../components/Movies.vue';
 import MovieDetail from '../components/MovieDetail.vue';
+import Login from '../components/Login.vue';
+import Signup from '../components/Signup.vue';
 
 Vue.use(VueRouter);
 
@@ -19,8 +21,18 @@ const routes: Array<RouteConfig> = [
   },
   {
     path: '/movies/:id',
-    name: 'MovieInfo',
+    name: 'MovieDetail',
     component: MovieDetail,
+  },
+  {
+    path: '/login',
+    name: 'Login',
+    component: Login,
+  },
+  {
+    path: '/signup',
+    name: 'Signup',
+    component: Signup,
   },
 ];
 

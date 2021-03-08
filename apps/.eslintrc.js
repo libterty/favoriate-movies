@@ -19,5 +19,9 @@ module.exports = {
     'lines-between-class-members': 'off',
     'no-trailing-spaces': 'off',
     'import/no-cycle': 'off',
+    'max-classes-per-file': 'off',
+    'object-curly-newline': 'off',
+    '@typescript-eslint/no-inferrable-types': 'off',
+    'no-plusplus': 'off',
   },
 };
