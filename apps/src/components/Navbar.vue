@@ -24,7 +24,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue, Watch } from 'vue-property-decorator';
 import { namespace } from 'vuex-class';
 import UsersApi from '../users/request';
 import ComponentHelper from '../utils/component.helper';
@@ -50,9 +50,13 @@ export default class Navbar extends Vue {
    * @Mounted
    */
   mounted() {
-    this.$store.subscribe((mutation, state) => {
-      this.checkStatus(state);
-    });
+    this.checkStatus();
+  }
+
+  @Watch('user')
+  userStateChange(next: IShare.IUserInfo, prev: IShare.IUserInfo) {
+    this.setUser(next);
+    this.checkStatus();
   }
 
   /**
@@ -60,18 +64,20 @@ export default class Navbar extends Vue {
    * @private
    * @returns {void}
    */
-  private checkStatus(state): void {
-    if (!state.Profile.user) {
+  private checkStatus(): void {
+    if (!this.user) {
       this.isLogin = false;
       return;
     }
-    if (!state.Profile.user.id) {
+    if (!this.user.id) {
       this.isLogin = false;
       return;
     }
-    const localStr = LocalStorageHelper.getWithExpiry(state.Profile.user.id);
+    const localStr = LocalStorageHelper.getWithExpiry(this.user.id);
+    
     if (!localStr) {
       this.isLogin = false;
+      return;
     }
     this.isLogin = true;
   }

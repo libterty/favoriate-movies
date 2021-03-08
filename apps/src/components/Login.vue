@@ -58,7 +58,29 @@ export default class Login extends Vue {
   @profile.State
   public user!: IShare.IUserInfo;
   @profile.Mutation
-  public setUser!: (userData: IShare.IUserInfo) => void;
+  public setUser!: (user: IShare.IUserInfo) => void;
+
+  mounted() {
+    this.checkStatus();
+  }
+
+  /**
+   * @description Check user status
+   * @returns {void}
+   */
+  private checkStatus(): void {
+    if (!this.user) {
+      return;
+    }
+    if (!this.user.id) {
+      return;
+    }
+    const localStr = LocalStorageHelper.getWithExpiry(this.user.id);
+    if (!localStr) {
+      return;
+    }
+    this.$router.push('/movies');
+  }
 
   /**
    * @description Submit Form
@@ -121,7 +143,7 @@ export default class Login extends Vue {
           throw new Error(err.message);
         })
         .finally(() => {
-          this.$router.push('/movies');
+          this.$router.push({ name: 'Movies' });
         });
     } catch (error) {
       return ComponentHelper.alertMsg('Login', 'Something went wrong', 'error');

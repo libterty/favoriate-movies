@@ -41,6 +41,7 @@ import { namespace } from 'vuex-class';
 import router from '../router';
 import UsersApi from '../users/request';
 import ComponentHelper from '../utils/component.helper';
+import LocalStorageHelper from '../localstorages/localstorage.provider';
 import { UserCreditDto } from '../users/dtos';
 import * as IShare from '../shares/interfaces';
 
@@ -59,6 +60,28 @@ export default class Signup extends Vue {
   public user!: IShare.IUserInfo;
   @profile.Mutation
   public setUser!: (userData: IShare.IUserInfo) => void;
+
+  mounted() {
+    this.checkStatus();
+  }
+
+  /**
+   * @description Check user status
+   * @returns {void}
+   */
+  private checkStatus(): void {
+    if (!this.user) {
+      return;
+    }
+    if (!this.user.id) {
+      return;
+    }
+    const localStr = LocalStorageHelper.getWithExpiry(this.user.id);
+    if (!localStr) {
+      return;
+    }
+    this.$router.push('/movies');
+  }
 
   /**
    * @description Submit Form
