@@ -5,7 +5,7 @@ In this moive application you will be able to real-time sharing your favorites m
 
 ## Prerequisite
 
-- Here are some essential tools that you need to you have to running project properly, and some optional tools if you want to change the repository.
+- Here are some essential tools that you need to have to running project properly, and some optional tools if you want to change the repository.
 And please feel free to make any changes that suit your interest.
 
 - [docker](https://www.docker.com/)
@@ -16,7 +16,10 @@ And please feel free to make any changes that suit your interest.
 
 ## tl;dr
 
-- Hold on, give me sometime to think what should i write here emmmmm
+- This is the first MVP of the favorite movie. The feature includes create/update/read/delete movies, also support authentication. But only write/update operation requires to be login. Meanwhile, the movies is connected to server
+with websocket to support real-time data. And each create/update movie request will store in `auditlog` table just
+for reference only. Maybe, someday in the future, the app will become more user friendly in UI, and supporting
+distributed services design. And we may or may not change to use KAFKA for streaming data in the future.
 
 ### Get Started
 
@@ -33,6 +36,40 @@ And please feel free to make any changes that suit your interest.
 
 - If you are not going to make any changes, the only two things you need is inside `docker-compose.yaml` and `Makefile`. To execute and running the application.
 You can start with `make help` to see what kinds of commands you can use. That's get started.
+
+### Install and Run
+
+-- Before running the application you need to build the entire app first, if you have questions about `make` commands go down below and take a look what our `makefile` can help you.
+
+```shell
+// Build Application
+make build
+```
+
+-- Once you finished building the application, you will know be able to spin up the multi-containers. 
+
+```shell
+// Run Application
+make up
+
+```
+
+** The App will running on `localhost:8080` as default, if you want to make any change, feel free to do so. **
+
+
+-- When you finished spinning up the application, you can go and see this log if you wanted. If you have any
+questions about logging, see `make logs` command down description below.
+-- In order to create a new movie, movie is required to have actors data in it. We have already prepare some
+sample actor data from `Back4App`. Try `make sh` commands to generate sample actors data.
+
+```shell
+// When your server is up, sh into your server
+make sh c=movies-server
+// once you are in, type npm run generate
+npm run generate
+// after create sample data, you are now good to go, type exit to exit
+exit
+```
 
 #### Helper command
 
@@ -106,4 +143,14 @@ make log            # log all containers
 make log c=database # log database only
 make log c=server   # log server only
 make log c=app      # log app only
+```
+
+#### Sh command
+
+- Is used to see sh into containers. To log specific container use for example if I only want to sh server container run `make sh c=movies-server`
+
+```shell
+make sh c=movies-db       # log database only
+make sh c=movies-server   # sh server only
+make sh c=movies-app      # log app only
 ```
