@@ -60,6 +60,7 @@
 
       <b-button-group>
         <b-button type="submit" variant="primary">Create New Movie!</b-button>
+        <b-button href="/movies" variant="primary">Back to Movie List!</b-button>
       </b-button-group>
     </b-form>
   </div>
