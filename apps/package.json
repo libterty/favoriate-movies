@@ -16,6 +16,7 @@
     "class-validator": "^0.13.1",
     "core-js": "^3.6.5",
     "sweetalert": "^2.1.2",
+    "sweetalert2": "^10.15.5",
     "v-viewer": "^1.5.1",
     "viewerjs": "^1.9.0",
     "vue": "^2.6.11",

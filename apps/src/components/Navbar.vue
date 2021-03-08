@@ -38,7 +38,6 @@ export default class Navbar extends Vue {
   public user!: IShare.IUserInfo;
 
   mounted() {
-    console.log('this.user: ', this.user);
     if (this.user && this.user.username) {
       this.isLogin = true;
     } else {

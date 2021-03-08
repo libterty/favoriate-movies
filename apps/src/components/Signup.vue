@@ -1,6 +1,6 @@
 <template>
   <div class="Signup">
-    <b-form @submit="onSubmit" @reset="onReset" v-if="show">
+    <b-form class="Signup-Form" @submit="onSubmit" v-if="show">
       <b-form-group
         id="input-group-1"
         label="Username"
@@ -26,39 +26,105 @@
         ></b-form-input>
       </b-form-group>
 
-      <b-button type="submit" variant="primary">Submit</b-button>
-      <b-button type="reset" variant="danger">Reset</b-button>
+      <b-button-group>
+        <b-button type="submit" variant="primary">SignUp Now!</b-button>
+        <b-button href="/login" variant="primary">Already have account?!</b-button>
+      </b-button-group>
     </b-form>
   </div>
 </template>
 
 <script lang='ts'>
 import { Component, Vue } from 'vue-property-decorator';
+import { validateOrReject } from 'class-validator';
+import { namespace } from 'vuex-class';
+import router from '../router';
+import UsersApi from '../users/request';
+import ComponentHelper from '../utils/component.helper';
+import { UserCreditDto } from '../users/dtos';
+import * as IShare from '../shares/interfaces';
+
+const profile = namespace('Profile');
 
 @Component
 export default class Signup extends Vue {
-  form = {
+  public form = {
     username: '',
     password: '',
   };
-  foods = [{ text: 'Select One', value: null }, 'Carrots', 'Beans', 'Tomatoes', 'Corn'];
-  show = true;
+  public show = true;
 
-  onSubmit(event) {
+  // Vuex Area
+  @profile.State
+  public user!: IShare.IUserInfo;
+  @profile.Mutation
+  public setUser!: (userData: IShare.IUserInfo) => void;
+
+  /**
+   * @description Submit Form
+   * @public
+   * @returns {Promise<void>}
+   */
+  public async onSubmit(event) {
     event.preventDefault();
-    alert(JSON.stringify(this.form));
+    const userCreditDto = new UserCreditDto();
+    userCreditDto.username = this.form.username;
+    userCreditDto.password = this.form.password;
+    await this.validateOrRejectDto(userCreditDto);
   }
 
-  onReset(event) {
-    event.preventDefault();
-    // Reset our form values
+  /**
+   * @description Validate Dto
+   * @private
+   * @param {UserCreditDto} userCreditDto
+   * @returns {Promise<void>}
+   */
+  private async validateOrRejectDto(userCreditDto: UserCreditDto): Promise<void> {
+    try {
+      await validateOrReject(userCreditDto)
+        .then(() => {
+          this.signUp(userCreditDto);
+        })
+        .catch((error) => {
+          ComponentHelper.alertMsg('Validate', ComponentHelper.parseValidationErrorMsg(error), 'error');
+        });
+    } catch (error) {
+      ComponentHelper.alertMsg('Validate', 'Caught promise rejection', 'error');
+    }
+  }
+
+  /**
+   * @description Sign up
+   * @private
+   * @param {UserCreditDto} userCreditDto
+   * @returns {Promise<unknown>}
+   */
+  private async signUp(userCreditDto: UserCreditDto): Promise<unknown> {
+    try {
+      const result = await UsersApi.signUpUser(userCreditDto);
+      if (typeof result === 'undefined') {
+        return ComponentHelper.alertMsg('Signup', 'Something went wrong', 'error');
+      }
+      if (result.status !== 'success') {
+        return ComponentHelper.alertMsg('Signup', result.message, 'error');
+      }
+      this.onReset();
+      return ComponentHelper
+        .alertMsgWithoutIcon('Signup', 'Signup success')
+        .then(() => this.$router.push({ name: 'Login' }));
+    } catch (error) {
+      return ComponentHelper.alertMsg('Signup', 'Something went wrong', 'error');
+    }
+  }
+
+  /**
+   * @description Rest form
+   * @private
+   * @returns {void}
+   */
+  private onReset() {
     this.form.username = '';
     this.form.password = '';
-    // Trick to reset/clear native browser form validation state
-    this.show = false;
-    this.$nextTick(() => {
-      this.show = true;
-    });
   }
 }
 </script>
@@ -66,5 +132,9 @@ export default class Signup extends Vue {
 <style scoped>
 .Signup {
   height: calc(100% - 50px);
+}
+.Signup-Form {
+  max-width: 80%;
+  margin: 5rem auto;
 }
 </style>

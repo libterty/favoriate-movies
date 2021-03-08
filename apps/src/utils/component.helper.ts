@@ -1,4 +1,4 @@
-import swal from 'sweetalert';
+import swal from 'sweetalert2';
 import * as IShare from '../shares/interfaces';
 
 export default abstract class ComponentHelper {
@@ -29,11 +29,27 @@ export default abstract class ComponentHelper {
    * @returns {Promise<any>}
    */
   public static alertMsg(title: string, text: string, icon: 'success' | 'error'): Promise<any> {
-    return swal({
+    return swal.fire({
       title,
       text,
+      timer: 2000,
       icon,
-      closeOnEsc: true,
+    });
+  }
+
+  /**
+   * @description Alert Helper without Icon
+   * @static
+   * @public static
+   * @param {string} title
+   * @param {string} text
+   * @returns {Promise<any>}
+   */
+  public static alertMsgWithoutIcon(title: string, text: string) {
+    return swal.fire({
+      title,
+      text,
+      timer: 1000,
     });
   }
 }

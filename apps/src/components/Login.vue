@@ -26,7 +26,10 @@
         ></b-form-input>
       </b-form-group>
 
-      <b-button type="submit" variant="primary">Submit</b-button>
+      <b-button-group>
+        <b-button type="submit" variant="primary">LogIn Now!</b-button>
+        <b-button href="/signup" variant="primary">Don't have account?!</b-button>
+      </b-button-group>
     </b-form>
   </div>
 </template>
@@ -45,11 +48,11 @@ const profile = namespace('Profile');
 
 @Component
 export default class Login extends Vue {
-  form = {
+  public form = {
     username: '',
     password: '',
   };
-  show = true;
+  public show = true;
 
   // Vuex Area
   @profile.State
@@ -57,7 +60,12 @@ export default class Login extends Vue {
   @profile.Mutation
   public setUser!: (userData: IShare.IUserInfo) => void;
 
-  async onSubmit(event) {
+  /**
+   * @description Submit Form
+   * @public
+   * @returns {Promise<void>}
+   */
+  public async onSubmit(event): Promise<void> {
     event.preventDefault();
     const signinCreditDto = new SigninCreditDto();
     signinCreditDto.username = this.form.username;
@@ -65,7 +73,13 @@ export default class Login extends Vue {
     await this.validateOrRejectDto(signinCreditDto);
   }
 
-  async validateOrRejectDto(signinCreditDto: SigninCreditDto): Promise<void> {
+  /**
+   * @description Validate Dto
+   * @private
+   * @param {SigninCreditDto} signinCreditDto
+   * @returns {Promise<void>}
+   */
+  private async validateOrRejectDto(signinCreditDto: SigninCreditDto): Promise<void> {
     try {
       await validateOrReject(signinCreditDto)
         .then(() => {
@@ -79,7 +93,13 @@ export default class Login extends Vue {
     }
   }
 
-  async signIn(signinCreditDto: SigninCreditDto) {
+  /**
+   * @description Sign in
+   * @private
+   * @param {SigninCreditDto} signinCreditDto
+   * @returns {Promise<unknown>}
+   */
+  private async signIn(signinCreditDto: SigninCreditDto): Promise<unknown> {
     try {
       const result = await UsersApi.signInUser(signinCreditDto);
       if (typeof result === 'undefined') {
@@ -92,13 +112,21 @@ export default class Login extends Vue {
       if (!userResult) return ComponentHelper.alertMsg('Login', 'Invalid Credits', 'error');
       LocalStorageHelper.setWithExpiry(userResult.user.id, { token: userResult.token }, 3600);
       this.onReset();
-      return ComponentHelper.alertMsg('Login', 'Login success', 'success');
+      return ComponentHelper
+        .alertMsgWithoutIcon('Login', 'Login success')
+        .then(() => this.$router.push({ name: 'Movies' }));
     } catch (error) {
       return ComponentHelper.alertMsg('Login', 'Something went wrong', 'error');
     }
   }
 
-  async getUserInfo(token: string): Promise<IShare.IGetUserInfoAPIResponse> {
+  /**
+   * @description get user information
+   * @private
+   * @param {string} token
+   * @returns {Promise<void>}
+   */
+  private async getUserInfo(token: string): Promise<IShare.IGetUserInfoAPIResponse> {
     try {
       const result = await UsersApi.getUserInfo(token);
       if (typeof result === 'undefined') {
@@ -116,7 +144,12 @@ export default class Login extends Vue {
     }
   }
 
-  onReset() {
+  /**
+   * @description Rest form
+   * @private
+   * @returns {void}
+   */
+  private onReset(): void {
     this.form.username = '';
     this.form.password = '';
   }
