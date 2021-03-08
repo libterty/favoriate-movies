@@ -194,7 +194,7 @@ export class MovieRepository extends Repository<Movie> {
   public async removeMovie(removeMovieByIdDto: RemoveMovieByIdDto): Promise<boolean> {
     try {
       const movie = await this.getMovieById(removeMovieByIdDto);
-      const delResult = await movie.softRemove();
+      const delResult = await movie.remove();
       if (!delResult) return false;
       return true;
     } catch (error) {
