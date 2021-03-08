@@ -13,6 +13,7 @@ import { createConnection, Connection } from 'typeorm';
 import { User } from '../users/user.entitiy';
 import { Movie } from '../movies/movie.entity';
 import { Actor } from '../actors/actor.entity';
+import { AuditLog } from '../audits/audit.entity';
 import { config } from '../../config';
 import { CreateActorDto } from '../actors/dtos';
 
@@ -84,7 +85,7 @@ class Back4Provider {
       username: config.DB_SETTINGS.username,
       password: config.DB_SETTINGS.password,
       database: config.DB_SETTINGS.database,
-      entities: [User, Movie, Actor],
+      entities: [User, Movie, Actor, AuditLog],
       synchronize: true,
     })
       .then((connection) => this.getStars(connection))
