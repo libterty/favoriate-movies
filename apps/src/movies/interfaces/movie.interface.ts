@@ -22,6 +22,7 @@ export interface CreateMovieDto {
   director: string;
   genre: EShare.EMovieTypes;
   actors: string[];
+  image: any;
 }
 
 export interface UpdateMovieByIdDto {

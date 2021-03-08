@@ -42,7 +42,17 @@ export default abstract class MoivessApi {
   static async createMovie(createMovieDto: CreateMovieDto, token: string): Promise<IShare.IResponseBase<IShare.IMovie>> {
     try {
       const url = 'http://localhost:7080/v1/api/movies';
-      const response = await this.movieAxios.post<IShare.IResponseBase<IShare.IMovie>>(url, createMovieDto, { headers: { Authorization: `Bearer ${token}` } });
+      const formData = new FormData();
+      formData.append('name', createMovieDto.name);
+      formData.append('desc', createMovieDto.desc);
+      formData.append('ratings', createMovieDto.ratings.toString());
+      formData.append('director', createMovieDto.director);
+      formData.append('genre', createMovieDto.genre);
+      createMovieDto.actors.forEach((actor) => {
+        formData.append('actors', actor);
+      });
+      formData.append('image', createMovieDto.image);
+      const response = await this.movieAxios.post<IShare.IResponseBase<IShare.IMovie>>(url, formData, { headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' } });
       return response.data;
     } catch (error) {
       throw new Error(error.message);

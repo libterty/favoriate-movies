@@ -43,4 +43,7 @@ export class CreateMovieDto {
 
   @IsArray()
   actors: string[] = [];
+
+  @IsOptional()
+  image: any;
 }

@@ -56,6 +56,8 @@
         <b-form-select v-model="form.actors" :options="actorsOptions" multiple required></b-form-select>
       </b-form-group>
 
+      <b-form-file v-model="form.image" class="mt-3" plain required></b-form-file>
+
       <b-button-group>
         <b-button type="submit" variant="primary">Create New Movie!</b-button>
       </b-button-group>
@@ -89,7 +91,9 @@ export default class CreateMovie extends Vue {
     director: '',
     genre: EShare.EMovieTypes.News,
     actors: [],
+    image: null,
   };
+  public file: any;
   public genreOptions = [];
   public actorsOptions = [];
   public show = true;
@@ -98,14 +102,23 @@ export default class CreateMovie extends Vue {
   @profile.State
   public user!: IShare.IUserInfo;
 
+  /**
+   * @LifeCycle
+   * @public
+   * @Mounted
+   */
   async mounted() {
     Object.keys(EShare.EMovieTypes).forEach((type) => {
       this.genreOptions.push({ value: EShare.EMovieTypes[type], text: EShare.EMovieTypes[type] });
     });
-    console.log('genreOptions', this.genreOptions);
     await this.getAllActors();
   }
 
+  /**
+   * @description Get auth token
+   * @private
+   * @returns {string}
+   */
   private getTokens(): string {
     if (!this.user) return null;
     if (!this.user.id) return null;
@@ -114,7 +127,12 @@ export default class CreateMovie extends Vue {
     return localStr;
   }
 
-  private async getAllActors() {
+  /**
+   * @description Get all actors
+   * @private
+   * @returns {Promise<void>}
+   */
+  private async getAllActors(): Promise<void> {
     try {
       const token = this.getTokens();
       if (!token) {
@@ -127,7 +145,6 @@ export default class CreateMovie extends Vue {
         keyword: '',
         sort: 'DESC',
       }, token);
-      console.log('reuslt: ', result);
       if (typeof result === 'undefined') {
         ComponentHelper.alertMsg('Validate', 'Caught promise rejection', 'error');
         return;
@@ -156,6 +173,7 @@ export default class CreateMovie extends Vue {
     createMovieDto.director = this.form.director;
     createMovieDto.genre = this.form.genre;
     createMovieDto.actors = this.form.actors;
+    createMovieDto.image = this.form.image;
     await this.validateOrRejectDto(createMovieDto);
   }
 
@@ -179,7 +197,13 @@ export default class CreateMovie extends Vue {
     }
   }
 
-  private async createMovie(createMovieDto: CreateMovieDto) {
+  /**
+   * @description Create movie
+   * @private
+   * @param {CreateMovieDto} createMovieDto
+   * @returns {Promise<unknown>}
+   */
+  private async createMovie(createMovieDto: CreateMovieDto): Promise<unknown> {
     try {
       const token = this.getTokens();
       if (!token) {
@@ -193,8 +217,7 @@ export default class CreateMovie extends Vue {
       if (result.status !== 'success') {
         return ComponentHelper.alertMsg('CreateMovie', 'Create movie failed', 'error');
       }
-      return ComponentHelper
-        .alertMsgWithoutIcon('CreateMovie', 'Create movie success');
+      return ComponentHelper.alertMsgWithoutIcon('CreateMovie', 'Create movie success');
     } catch (error) {
       return ComponentHelper.alertMsg('CreateMovie', 'Something went wrong', 'error');
     }
