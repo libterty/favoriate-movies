@@ -23,5 +23,7 @@ module.exports = {
     'object-curly-newline': 'off',
     '@typescript-eslint/no-inferrable-types': 'off',
     'no-plusplus': 'off',
+    'default-case': 'off',
+    'no-param-reassign': 'off',
   },
 };
