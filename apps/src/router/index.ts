@@ -4,6 +4,7 @@ import Home from '../views/Home.vue';
 import Movies from '../components/Movies.vue';
 import CreateMovie from '../components/CreateMovie.vue';
 import MovieDetail from '../components/MovieDetail.vue';
+import UpdateMovie from '../components/UpdateMovie.vue';
 import Login from '../components/Login.vue';
 import Signup from '../components/Signup.vue';
 
@@ -29,6 +30,11 @@ const routes: Array<RouteConfig> = [
     path: '/movies/:id',
     name: 'MovieDetail',
     component: MovieDetail,
+  },
+  {
+    path: '/movies/:id/edit',
+    name: 'UpdateMovie',
+    component: UpdateMovie,
   },
   {
     path: '/login',

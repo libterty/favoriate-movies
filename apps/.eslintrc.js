@@ -27,5 +27,6 @@ module.exports = {
     'no-param-reassign': 'off',
     'dot-notation': 'off',
     'import/prefer-default-export': 'off',
+    'no-useless-escape': 'off',
   },
 };

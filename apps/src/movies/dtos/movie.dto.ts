@@ -1,4 +1,4 @@
-import { IsArray, IsEnum, IsInstance, IsNumber, IsNumberString, IsOptional, IsString, IsUUID, MaxLength, MinLength } from 'class-validator';
+import { IsArray, IsEnum, IsNumber, IsNumberString, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
 import * as EShare from '../../shares/enums';
 
 export class CreateMovieDto {
@@ -46,4 +46,36 @@ export class CreateMovieDto {
 
   @IsOptional()
   image: any;
+}
+
+export class UpdateMovieDto {
+  @IsOptional()
+  @IsString({
+    message: 'Movie name must be a string type',
+  })
+  name?: string = '';
+
+  @IsOptional()
+  @IsString({
+    message: 'Movie description must be a string type',
+  })
+  desc?: string = '';
+
+  @IsOptional()
+  @IsNumber()
+  ratings?: number = 0;
+
+  @IsOptional()
+  @IsString({
+    message: 'Movie director must be a string type',
+  })
+  director?: string = '';
+
+  @IsOptional()
+  @IsEnum(EShare.EMovieTypes)
+  genre?: EShare.EMovieTypes = EShare.EMovieTypes.News;
+
+  @IsOptional()
+  @IsArray()
+  actors?: string[] = [];
 }

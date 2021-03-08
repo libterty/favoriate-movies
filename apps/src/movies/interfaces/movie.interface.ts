@@ -30,6 +30,6 @@ export interface UpdateMovieByIdDto {
   desc?: string;
   ratings?: number;
   director?: string;
-  genre: EShare.EMovieTypes;
+  genre?: EShare.EMovieTypes;
   actors?: string[];
 }
