@@ -208,7 +208,11 @@ export default class CreateMovie extends Vue {
     try {
       const token = this.getTokens();
       if (!token) {
-        return ComponentHelper.alertMsg('Validate', 'Invalid request', 'error');
+        return ComponentHelper
+          .alertMsg('Validate', 'Invalid request', 'error')
+          .then(() => {
+            this.$router.push('/login');
+          });
       }
       const result = await MoivessApi.createMovie(createMovieDto, token);
       console.log('result: ', result);
@@ -219,7 +223,11 @@ export default class CreateMovie extends Vue {
         return ComponentHelper.alertMsg('CreateMovie', 'Create movie failed', 'error');
       }
       this.onReset();
-      return ComponentHelper.alertMsgWithoutIcon('CreateMovie', 'Create movie success');
+      return ComponentHelper
+        .alertMsgWithoutIcon('CreateMovie', 'Create movie success')
+        .then(() => {
+          this.$router.push('/movies');
+        });
     } catch (error) {
       return ComponentHelper.alertMsg('CreateMovie', 'Something went wrong', 'error');
     }

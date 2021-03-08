@@ -15,6 +15,7 @@ const routes: Array<RouteConfig> = [
     path: '/',
     name: 'Home',
     component: Home,
+    redirect: '/movies',
   },
   {
     path: '/movies',
