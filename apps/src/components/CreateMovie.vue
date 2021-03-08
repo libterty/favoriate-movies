@@ -217,10 +217,26 @@ export default class CreateMovie extends Vue {
       if (result.status !== 'success') {
         return ComponentHelper.alertMsg('CreateMovie', 'Create movie failed', 'error');
       }
+      this.onReset();
       return ComponentHelper.alertMsgWithoutIcon('CreateMovie', 'Create movie success');
     } catch (error) {
       return ComponentHelper.alertMsg('CreateMovie', 'Something went wrong', 'error');
     }
+  }
+
+  /**
+   * @description Rest form
+   * @private
+   * @returns {void}
+   */
+  private onReset(): void {
+    this.form.name = '';
+    this.form.desc = '';
+    this.form.ratings = 0;
+    this.form.director = '';
+    this.form.genre = EShare.EMovieTypes.News;
+    this.form.actors = [];
+    this.form.image = null;
   }
 }
 </script>
