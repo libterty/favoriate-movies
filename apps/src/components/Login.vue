@@ -110,11 +110,19 @@ export default class Login extends Vue {
       }
       const userResult = await this.getUserInfo(result.message);
       if (!userResult) return ComponentHelper.alertMsg('Login', 'Invalid Credits', 'error');
-      LocalStorageHelper.setWithExpiry(userResult.user.id, { token: userResult.token }, 3600);
+      LocalStorageHelper.setWithExpiry(userResult.user.id, { token: userResult.token }, 3600 * 1000);
       this.onReset();
       return ComponentHelper
         .alertMsgWithoutIcon('Login', 'Login success')
-        .then(() => this.$router.push({ name: 'Movies' }));
+        .then(() => {
+          this.setUser(userResult.user);
+        })
+        .catch((err) => {
+          throw new Error(err.message);
+        })
+        .finally(() => {
+          this.$router.push('/movies');
+        });
     } catch (error) {
       return ComponentHelper.alertMsg('Login', 'Something went wrong', 'error');
     }
@@ -133,7 +141,6 @@ export default class Login extends Vue {
         ComponentHelper.alertMsg('Login', 'Something went wrong', 'error');
         return null;
       }
-      this.setUser(result.message.user);
       return {
         token,
         user: result.message.user,

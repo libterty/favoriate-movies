@@ -45,10 +45,34 @@ export default abstract class UsersApi {
     }
   }
 
+  /**
+   * @description Get user information
+   * @public
+   * @static
+   * @param {string} token
+   * @returns {Promise<IShare.IResponseBase<{ user: IShare.IUserInfo }>>}
+   */
   static async getUserInfo(token: string): Promise<IShare.IResponseBase<{ user: IShare.IUserInfo }>> {
     try {
       const url = 'http://localhost:7080/v1/api/users/info';
       const response = await this.usersAxios.get<IShare.IResponseBase<{ user: IShare.IUserInfo }>>(url, { headers: { Authorization: `Bearer ${token}` } });
+      return response.data;
+    } catch (error) {
+      throw new Error(error.message);
+    }
+  }
+
+  /**
+   * @description Logout user
+   * @public
+   * @static
+   * @param {string} token
+   * @returns {Promise<IShare.IResponseBase<any>>}
+   */
+  static async logOutUser(token: string): Promise<IShare.IResponseBase<any>> {
+    try {
+      const url = 'http://localhost:7080/v1/api/users/logout';
+      const response = await this.usersAxios.get<IShare.IResponseBase<any>>(url, { headers: { Authorization: `Bearer ${token}` } });
       return response.data;
     } catch (error) {
       throw new Error(error.message);

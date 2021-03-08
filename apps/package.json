@@ -27,6 +27,7 @@
     "vuex": "^3.4.0",
     "vuex-class": "^0.3.2",
     "vuex-module-decorators": "^1.0.1",
+    "vuex-persistedstate": "^4.0.0-beta.3",
     "webpack-stream": "^6.1.2"
   },
   "devDependencies": {

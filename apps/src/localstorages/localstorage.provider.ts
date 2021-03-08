@@ -38,11 +38,21 @@ export default abstract class LocalStorageHelper {
     if (!dataStr) return null;
     const parsedData: IShare.IStorageData = JSON.parse(dataStr);
     const now = Date.now();
-
     if (now > parsedData.exp) {
       localStorage.removeItem(key);
       return null;
     }
     return parsedData.value;
+  }
+
+  /**
+   * @description Remove localstorage with key
+   * @public
+   * @static
+   * @param {string} key
+   * @returns {void}
+   */
+  public static removeToken(key: string): void {
+    localStorage.removeItem(key);
   }
 }

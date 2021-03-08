@@ -14,7 +14,9 @@
             <em v-if="!isLogin">Hi Anonymous please login!!</em>
           </template>
           <b-dropdown-item v-if="!isLogin" href="/login">Sign In</b-dropdown-item>
-          <b-dropdown-item v-if="isLogin" href="#">Sign Out</b-dropdown-item>
+          <b-dropdown-item v-if="isLogin" href="#">
+            <b-button variant="primary" size="sm" @click="logOutUser">Sign Out</b-button>
+          </b-dropdown-item>
         </b-nav-item-dropdown>
       </b-navbar-nav>
     </b-collapse>
@@ -24,6 +26,9 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import { namespace } from 'vuex-class';
+import UsersApi from '../users/request';
+import ComponentHelper from '../utils/component.helper';
+import LocalStorageHelper from '../localstorages/localstorage.provider';
 import * as IShare from '../shares/interfaces';
 
 const profile = namespace('Profile');
@@ -36,12 +41,70 @@ export default class Navbar extends Vue {
   // Vuex Area
   @profile.State
   public user!: IShare.IUserInfo;
+  @profile.Mutation
+  public setUser!: (userData: IShare.IUserInfo) => void;
 
+  /**
+   * @LifeCycle
+   * @public
+   * @Mounted
+   */
   mounted() {
-    if (this.user && this.user.username) {
-      this.isLogin = true;
-    } else {
+    this.checkStatus();
+  }
+
+  /**
+   * @description Check user status
+   * @private
+   * @returns {void}
+   */
+  private checkStatus(): void {
+    if (!this.user) {
       this.isLogin = false;
+      return;
+    }
+    if (!this.user.id) {
+      this.isLogin = false;
+      return;
+    }
+    const localStr = LocalStorageHelper.getWithExpiry(this.user.id);
+    if (!localStr) {
+      this.isLogin = false;
+    }
+    this.isLogin = true;
+  }
+
+  /**
+   * @description Log out user
+   * @public
+   * @returns {Promise<unknown>}
+   */
+  async logOutUser(): Promise<unknown> {
+    const localStrToken = LocalStorageHelper.getWithExpiry(this.user.id);
+    if (typeof localStrToken !== 'string') return null;
+    try {
+      const result = await UsersApi.logOutUser(localStrToken);
+      if (typeof result === 'undefined') {
+        return ComponentHelper.alertMsg('Logout', 'Something went wrong', 'error');
+      }
+      if (result.status !== 'success') {
+        return ComponentHelper.alertMsg('Logout', result.message, 'error');
+      }
+      this.isLogin = false;
+      LocalStorageHelper.removeToken(this.user.id);
+      return ComponentHelper
+        .alertMsgWithoutIcon('Logout', 'Logout success')
+        .then(() => {
+          this.setUser(null);
+        })
+        .catch((err) => {
+          throw new Error(err.message);
+        })
+        .finally(() => {
+          this.$router.push('/login');
+        });
+    } catch (error) {
+      return ComponentHelper.alertMsg('Logout', 'Something went wrong', 'error');
     }
   }
 }
