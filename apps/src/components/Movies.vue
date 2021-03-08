@@ -157,7 +157,7 @@ export default class Movies extends Vue {
    * @returns {void}
    */
   public onRowSelected(items: IMovie.IMovieTable[]): void {
-    this.$router.push({ name: 'MovieInfo', params: { id: items[0].id } });
+    this.$router.push(`/movies/${items[0].id}`);
   }
 }
 </script>
