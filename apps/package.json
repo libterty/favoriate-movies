@@ -1,6 +1,6 @@
 {
   "name": "apps",
-  "version": "0.1.0",
+  "version": "1.0.2",
   "private": true,
   "scripts": {
     "build:test": "docker build -t favoriate-movies-client-build-test .",
